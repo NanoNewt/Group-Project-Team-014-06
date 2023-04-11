@@ -1,0 +1,47 @@
+<%- include ('../partials/head') %>
+
+<main>
+  <div class="container d-flex align-items-center justify-content-center flex-column">
+    <div class="d-flex flex-row justify-content-center align-items-center">
+      <img src="/biglogo" class="img-small mr-3">
+      <div class="d-flex flex-column">
+        <form method="GET" action="/login">
+          <button type="submit" class="btn btn-light btn-block mb-1 mr-2" style="font-size: 2rem;">Login</button>
+        </form>
+        <form method="GET" action="/register">
+          <button type="submit" class="btn btn-light btn-block mb-1 ml-2" style="font-size: 2rem;">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<style>
+.img-small {
+  width: 70%;
+  height: auto;
+}
+.container {
+  height: 100vh;
+}
+.d-flex.flex-row.justify-content-center.align-items-center div {
+margin-left: auto;
+margin-right: auto;
+}
+.btn-block {
+text-align: left;
+color: rgb(51, 51, 51);
+}
+.btn-light {
+  background-color: transparent;
+  border: none;
+}
+.btn-light:hover {
+background-color: transparent;
+box-shadow: none;
+color: gray;
+}
+</style>
+
+<%- include ('../partials/footer') %>

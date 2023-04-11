@@ -1,0 +1,74 @@
+<%- include ('../partials/head') %>
+
+<main>
+    <a href="/">
+        <img src="/icon" alt="icon" width="50" height="50">
+    </a>
+    <img src="/backsplash" alt="backsplash" class="backsplash">
+    <div class="center">
+        <div class="container">
+          <h1>Login</h1>
+          <form action="/login" method="post">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="form-group d-flex justify-content-between align-items-center">
+              <button type="submit" class="btn btn-light">Login</button>
+              <p class="text-muted mb-0">Don't have an account? <a href="/register">Register</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+      <a href="/testann" class="btn btn-sm btn-secondary position-fixed bottom-0 start-0 mb-3 ms-3">.</a>
+</main>
+
+
+<style>
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 40px);
+}
+a[href="/"] {
+  position: absolute;
+  top: 0;
+  left: center;
+}
+img[src="/backsplash"] {
+  width: 4%;
+  height: auto;
+  margin-top: -20px;
+}
+.backsplash {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.container {
+  width: 500px;
+  max-width: 500px;
+  height: auto;
+  margin: auto;
+  padding: 30px;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.form-group {
+  margin-bottom: 15px;
+}
+input.form-control {
+  width: 100%;
+}
+a[href="/register"] {
+  color: gray;
+}
+</style>
+
+<%- include ('../partials/footer') %>
