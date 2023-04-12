@@ -74,6 +74,30 @@ app.get('/register', (req, res) => {
   res.render("pages/register");
 });
 
+app.post('/register', async (req,res) => {
+
+  const username = req.body.username;
+  const password = req.body.password;
+  // check for bad request
+  if(username == null || password == null){
+    throw new Error("missing username and/or password");
+  }
+
+  //hash the password using bcrypt library
+  const hashed_password = await bcrypt.hash(password, 10);
+
+  //Insert username and hashed password into 'users' table
+  const insert_sql = `INSERT INTO users (username, password) VALUES ('${username}', '${hashed_password}');`;
+
+  try {
+    await db.any(insert_sql);
+    res.redirect('/login');
+  } catch (error){
+    console.log(error)
+    res.redirect('/register');
+  }
+});
+
 app.get('/testann', (req, res) => {
   res.render("pages/testann");
 });
