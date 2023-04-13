@@ -72,8 +72,49 @@ app.get('/', (req, res) => {
   res.render("pages/splash");
 });
 
+
+//login
 app.get('/login', (req, res) => {
   res.render("pages/login");
+});
+
+
+app.post('/login', async (req, res) => {
+  const password = req.body.password;
+  const username = req.body.username;
+  const query = "select * from users where username = $1";  
+  const values = [username];
+
+  db.one(query, values)
+    .then((data) => {
+      user.username = data.username;
+      user.password = data.password;
+      const match = bcrypt.compare(req.body.password, user.password);
+
+      match.then(function(result){
+        if(result){
+          req.session.user = user;
+          req.session.save();
+          res.redirect("/discover");
+        }
+        else{
+          console.log("Incorrect username or password.");
+          res.render("pages/login", {
+            error: true,
+            message: "Incorrect username or password.",
+          });
+        }
+      })
+
+    })
+    .catch((err) => {
+      console.log(err);
+      //res.redirect("/register");
+      res.render("pages/register", {
+        error: true,
+        message: "Username doesn't exist, please register",
+      });
+    });
 });
 
 app.get('/register', (req, res) => {
