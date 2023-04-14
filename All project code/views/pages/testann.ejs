@@ -1,49 +1,174 @@
 <%- include ('../partials/head') %>
 
-<main>
-    <div class="box">
-        <main>
-          <h1>Boeing 747</h1>
-          <p>
-            This behemoth of a plane transformed the greater air travel upon its unveiling in 1969, restructuring the way for long distance travel for full service carriers around the globe. Simply said this “jumbo jet” changed the economics in flying, that being said the more people they could fit onto a plane meant for lower prices. The first year that the 747 was in operation it cut the cost of flying in half, which gave exponential growth in air travel where flying really became accessible to the greater population. This was made relevant with the airline deregulation in the United States, specifically this was the start of affordable long haul travel. While the 747 not only allowed for more passengers and lower fares it also came with new cabin features like using the upper deck for a unique experience for first class flyers. The 747 was not only used for passenger flight but also was used as a freighter as in transportation of cargo. Fast forward to the present day, a lot of 747’s that are still flying are indeed used as freight carriers. Over the years of operation of the 747, there would be new technological advancements to improve all aspects of flight for airline customers. Those would be identified as special suffixes to the 747 name, highlighting some of the more prevalent ones apart from the full passenger jet, they developed freighters and passenger freighter models known as the ‘combi’. As an airline, many felt like they had to have this jet as a representation of their services while many of them financially could not afford it. The plane continued to evolve and served other purposes like government transport including air force one. The best selling version of this plane was manufactured over the next few decades with the name of 747-400, this version had more efficient energy models, longer range and a more modernized interior and/or cabin.
-          </p>
-          <button onclick="highlightText()">Annotate</button>
-          <script>
-            function highlightText() {
-              var selection = window.getSelection();
-              if (selection.rangeCount) {
-                var range = selection.getRangeAt(0).cloneRange();
-                var highlight = document.createElement('span');
-                highlight.classList.add('highlight');
-                range.surroundContents(highlight);
-                selection.removeAllRanges();
-                selection.addRange(range);
-              }
-            }
-          </script>
-        </main>
-      </div>      
+
+
+<script>
+  let annotations = [];
+  let cur_annotation;
+
+  function set_cur_annotation(id){
+    cur_annotation = annotations.find(ann => {return ann.id == id});
+    refresh_comments();
+  }
+
+  function removeAllChildren(node){
+    while(node.hasChildNodes()){
+      node.removeChild(node.firstChild);
+    }
+  }
+
+  function add_comment(text){
+    cur_annotation.comments.push(text);
+    refresh_comments();
+  }
+
+  function largest_id(array){
+    let largest = -1;
+    array.forEach(element => {
+      if(element.id > largest){
+        largest = element.id;
+      }
+    });
+    return largest;
+  }
+
+  function refresh_comments(){
+    const comments_section = document.querySelector('#comment_section');
+    const annotation_box = document.querySelector('#current_annotation_box');
+
+    //refresh annotation_box
+    if(cur_annotation.text_elm.innerHTML == null){
+      annotation_box.innerHTML = "none";
+      return;
+    }
+    annotation_box.innerHTML = cur_annotation.text_elm.innerHTML;
+
+    //clear old comments
+    removeAllChildren(comments_section);
+    //display this annotated text's comments
+    cur_annotation.comments.forEach(comment => {
+      new_comment = document.createElement('div');
+      new_comment.classList.add('card');
+      new_comment.innerHTML = comment;
+
+      comments_section.appendChild(new_comment);
+    });
+  }
+
+  function create_annotation(){
+    new_annotation = {
+      id:largest_id(annotations) + 1,
+      text_elm: highlightText(),
+      comments: []
+    };
+    
+    annotations.push(new_annotation);
+    console.log(new_annotation);
+    new_annotation.text_elm.setAttribute('onclick', `set_cur_annotation(${new_annotation.id})`);
+    cur_annotation = new_annotation;
+    refresh_comments()
+  }
+
+  function highlightText() {
+    var selection = window.getSelection();
+    if (selection.rangeCount) {
+      var range = selection.getRangeAt(0).cloneRange();
+      var highlight = document.createElement('span');
+      highlight.classList.add('highlight');
+      range.surroundContents(highlight);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return highlight;  
+    }
+  }
+
+</script>
+
+
+<main> 
+  <div class="col-container">
+    <div class="col-9">
+      <main id="annotation_pages">
+        <h1>Boeing 747</h1>
+        <p id="book_to_annotate">
+          This behemoth of a plane transformed the greater air travel upon its unveiling in 1969, restructuring the way for long distance travel for full service carriers around the globe. Simply said this “jumbo jet” changed the economics in flying, that being said the more people they could fit onto a plane meant for lower prices. The first year that the 747 was in operation it cut the cost of flying in half, which gave exponential growth in air travel where flying really became accessible to the greater population. This was made relevant with the airline deregulation in the United States, specifically this was the start of affordable long haul travel. While the 747 not only allowed for more passengers and lower fares it also came with new cabin features like using the upper deck for a unique experience for first class flyers. The 747 was not only used for passenger flight but also was used as a freighter as in transportation of cargo. Fast forward to the present day, a lot of 747’s that are still flying are indeed used as freight carriers. Over the years of operation of the 747, there would be new technological advancements to improve all aspects of flight for airline customers. Those would be identified as special suffixes to the 747 name, highlighting some of the more prevalent ones apart from the full passenger jet, they developed freighters and passenger freighter models known as the ‘combi’. As an airline, many felt like they had to have this jet as a representation of their services while many of them financially could not afford it. The plane continued to evolve and served other purposes like government transport including air force one. The best selling version of this plane was manufactured over the next few decades with the name of 747-400, this version had more efficient energy models, longer range and a more modernized interior and/or cabin.
+        </p>
+          <button onclick="create_annotation()">Annotate</button>
+      </main>
+    </div>
+    <div class="col-3">
+      <div class="row justify-content-md-center" id="cur_annotation_row">
+        <h6>current annotation</h6>
+        <div class="container-fluid" id="current_annotation_box"></div>
+      </div>
+      <div class="row justify-content-md-center" id="comment_section_row">
+        <h6>comments</h6>
+        <div class="container-fluid" id="comment_section"></div>
+      </div>
+      <div class="row justify-content-md-center" id="add_comment_row">
+        <input type="text" id="add_comment_text">
+        <button onclick="add_comment(add_comment_text.value)" id="add_comment_btn">add comment</button>
+      </div> 
+    </div>
+  </div>
 </main>
 
 
 <style>
 
-.box {
-  border: 1px solid #ccc;
-  position: absolute;
-  left: 50%;
-  top: 50%;
+.row{
+  padding-right: 5px;
+  padding-left: 5px;
+  text-align: center;
+}
+
+#current_annotation_box{
+  border: 1px solid #000000;
+  padding: 5px;
+  overflow-y: scroll;
+  height: 2.5rem;
+  width: 100%;
+}
+
+#comment_section_row {
+  height: 70%;
+}
+#comment_section{
+  border: 1px solid #000000;
+  height: 55vh;
+  overflow-y: scroll;
+}
+
+#add_comment_row, #cur_annotation_row{
+  height: 15%;
+
+}
+#add_comment_btn, #add_comment_text{
+  width: 100%;
+}
+
+
+.col-container {
+  display: flex;
+  width: 100%;
+}
+.col-3 {
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  transform: translate(-50%, -50%);
-  max-width: 800px;
-  width: calc(100% + 200px);
+  border: 2px solid #000000;
+}
+
+#annotation_pages{
+  border: 2px solid #000000;
+  padding: 20px;
+  height: 100vh;
+}
+#book_to_annotate{
+  height: 75vh;
+  overflow-y: scroll;
 }
 
 .highlight {
   background-color: yellow;
 }
 </style>
-
 <%- include ('../partials/footer') %>
