@@ -68,6 +68,25 @@ app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
 
+app.get('/testann', (req, res) => {
+  res.render("pages/testann");
+});
+
+app.get('/biglogo', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'easyreads-big.png');
+  res.sendFile(imagePath);
+});
+
+app.get('/icon', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'icon.png');
+  res.sendFile(imagePath);
+});
+
+app.get('/backsplash', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'backsplash.png');
+  res.sendFile(imagePath);
+});
+
 app.get('/literature', (req, res) => {
   res.render("pages/literature");
 });
