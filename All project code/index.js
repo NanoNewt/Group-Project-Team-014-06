@@ -62,6 +62,11 @@ app.use(
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
+const books = {
+  name: 'b1',
+  author: 'a1',
+  genre: 'g1',
+};
 
 // Lab 11
 app.get('/welcome', (req, res) => {
@@ -92,7 +97,10 @@ app.get('/literature', (req, res) => {
 });
 
 app.get('/books', (req, res) => {
-res.render("pages/books");
+  res.render("pages/books", {
+    // books: ['b1', 'a1', 'g1'],
+  });
+  // console.log(books);
 });
 
 app.get('/class_notes', (req, res) => {
@@ -188,6 +196,16 @@ app.get('/biglogo', (req, res) => {
 
 app.get('/icon', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'icon.png');
+  res.sendFile(imagePath);
+});
+
+app.get('/book_img', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'books.jpg');
+  res.sendFile(imagePath);
+});
+
+app.get('/classnotes_img', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'class_notes.jpg');
   res.sendFile(imagePath);
 });
 
