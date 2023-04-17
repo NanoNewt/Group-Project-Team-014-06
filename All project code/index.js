@@ -158,8 +158,8 @@ app.post('/register', async (req,res) => {
   }
 });
 
-app.get('/testann', (req, res) => {
-  res.render("pages/testann");
+app.get('/annotations', (req, res) => {
+  res.render("pages/annotations");
 });
 
 app.get('/biglogo', (req, res) => {
