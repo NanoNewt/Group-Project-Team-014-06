@@ -64,6 +64,9 @@ app.use(
 
 
 // Lab 11
+
+const user = {};
+
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
@@ -127,11 +130,11 @@ app.post('/login', async (req, res) => {
         if(result){
           req.session.user = user;
           req.session.save();
-          res.redirect("/discover");
+          res.redirect("/");
         }
         else{
           console.log("Incorrect username or password.");
-          res.render("pages/login", {
+          res.status(300).render("pages/login", {
             error: true,
             message: "Incorrect username or password.",
           });
@@ -170,10 +173,10 @@ app.post('/register', async (req,res) => {
 
   try {
     await db.any(insert_sql);
-    res.redirect('/login');
+    res.redirect(200, '/login');
   } catch (error){
     console.log(error)
-    res.redirect('/register');
+    res.redirect(300, '/register');
   }
 });
 
