@@ -68,6 +68,19 @@ app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
 
+app.get('/literature', (req, res) => {
+  res.render("pages/literature");
+});
+
+app.get('/books', (req, res) => {
+res.render("pages/books");
+});
+
+app.get('/class_notes', (req, res) => {
+res.render("pages/class_notes");
+});
+
+
 app.get('/', (req, res) => {
   res.render("pages/splash");
 });
@@ -129,10 +142,6 @@ app.post('/register', async (req,res) => {
   if(username == null || password == null){
     throw new Error("missing username and/or password");
   }
-
-app.get('/literature', (req, res) => {
-    res.render("pages/literature");
-});
 
   //hash the password using bcrypt library
   const hashed_password = await bcrypt.hash(password, 10);
