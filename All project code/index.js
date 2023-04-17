@@ -130,6 +130,10 @@ app.post('/register', async (req,res) => {
     throw new Error("missing username and/or password");
   }
 
+app.get('/literature', (req, res) => {
+    res.render("pages/literature");
+});
+
   //hash the password using bcrypt library
   const hashed_password = await bcrypt.hash(password, 10);
 
