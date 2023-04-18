@@ -85,17 +85,17 @@
 
 </script>
 
-
+<%- include ('../partials/menu') %>
 <main> 
   <div class="col-container">
     <div class="col-9">
-      <main id="annotation_pages">
+      <div class="container" id="annotation_pages">
         <h1>Boeing 747</h1>
         <p id="book_to_annotate">
           This behemoth of a plane transformed the greater air travel upon its unveiling in 1969, restructuring the way for long distance travel for full service carriers around the globe. Simply said this “jumbo jet” changed the economics in flying, that being said the more people they could fit onto a plane meant for lower prices. The first year that the 747 was in operation it cut the cost of flying in half, which gave exponential growth in air travel where flying really became accessible to the greater population. This was made relevant with the airline deregulation in the United States, specifically this was the start of affordable long haul travel. While the 747 not only allowed for more passengers and lower fares it also came with new cabin features like using the upper deck for a unique experience for first class flyers. The 747 was not only used for passenger flight but also was used as a freighter as in transportation of cargo. Fast forward to the present day, a lot of 747’s that are still flying are indeed used as freight carriers. Over the years of operation of the 747, there would be new technological advancements to improve all aspects of flight for airline customers. Those would be identified as special suffixes to the 747 name, highlighting some of the more prevalent ones apart from the full passenger jet, they developed freighters and passenger freighter models known as the ‘combi’. As an airline, many felt like they had to have this jet as a representation of their services while many of them financially could not afford it. The plane continued to evolve and served other purposes like government transport including air force one. The best selling version of this plane was manufactured over the next few decades with the name of 747-400, this version had more efficient energy models, longer range and a more modernized interior and/or cabin.
         </p>
           <button onclick="create_annotation()">Annotate</button>
-      </main>
+      </div>
     </div>
     <div class="col-3">
       <div class="row justify-content-md-center" id="cur_annotation_row">
@@ -103,7 +103,7 @@
         <div class="container-fluid" id="current_annotation_box"></div>
       </div>
       <div class="row justify-content-md-center" id="comment_section_row">
-        <h6>comments</h6>
+        <h6 id="comments_header">comments</h6>
         <div class="container-fluid" id="comment_section"></div>
       </div>
       <div class="row justify-content-md-center" id="add_comment_row">
@@ -113,36 +113,47 @@
     </div>
   </div>
 </main>
-
-
+<%- include ('../partials/footer') %>
 <style>
+
 
 .row{
   padding-right: 5px;
   padding-left: 5px;
+  padding-top: 0;
+  padding-bottom: 0;
   text-align: center;
 }
 
-
 #current_annotation_box{
   border: 1px solid #000000;
-  padding: 5px;
+  padding: 0px;
   overflow-y: scroll;
-  height: 16vh;
+  height: 20vh;
   width: 100%;
 }
 
-#comment_section_row {
-  height: 60%;
-}
+
 #comment_section{
   border: 1px solid #000000;
   height: 40vh;
   overflow-y: scroll;
 }
 
+#comments_header{
+  height: 5%;
+  width: 100%;
+  position: relative;
+  top: 10px;
+}
+
+#comment_section_row {
+  height: 55%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
 #add_comment_row{
-  height: 15%;
+  height: 10%;
 }
 #cur_annotation_row{
   height: 25%;
@@ -155,10 +166,15 @@
 
 .col-container {
   display: flex;
+  flex-direction: row;
   width: 100%;
+}
+.col-9{
+  flex-shrink: 1;
 }
 .col-3 {
   padding: 20px;
+  flex-shrink: 1;
 }
 
 #annotation_pages{
@@ -166,12 +182,34 @@
   height: 100vh;
 }
 #book_to_annotate{
-  height: 75%;
+  height: 67%;
   overflow-y: scroll;
+}
+body{
+  position: relative;
+  min-height: 100vh; 
+  overflow: hidden;
+}
+
+main{
+  padding-top: 10vh; /*equal header height*/
+  padding-bottom: 6vh; /*equal footer height*/
+}
+
+header{
+  position: absolute;
+  width: 100%;
+  height: 10vh; 
+}
+
+footer{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  height: 5vh; 
 }
 
 .highlight {
   background-color: yellow;
 }
 </style>
-<%- include ('../partials/footer') %>
