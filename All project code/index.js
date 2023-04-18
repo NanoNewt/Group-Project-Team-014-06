@@ -160,6 +160,19 @@ app.post('/login', async (req, res) => {
     });
 });
 
+
+app.get("/profile", (req, res) => {
+  res.render("pages/profile", {
+    username: req.session.user.username,
+    first_name: req.session.user.first_name,
+    last_name: req.session.user.last_name,
+    email: req.session.user.email,
+    year: req.session.user.year,
+    major: req.session.user.major,
+    degree: req.session.user.degree,
+  });
+});
+
 app.get('/register', (req, res) => {
   res.render("pages/register");
 });
