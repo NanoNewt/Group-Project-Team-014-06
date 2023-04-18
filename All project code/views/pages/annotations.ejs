@@ -49,6 +49,7 @@
     cur_annotation.comments.forEach(comment => {
       new_comment = document.createElement('div');
       new_comment.classList.add('card');
+      new_comment.classList.add('comment');
       new_comment.innerHTML = comment;
 
       comments_section.appendChild(new_comment);
@@ -122,27 +123,31 @@
   text-align: center;
 }
 
+
 #current_annotation_box{
   border: 1px solid #000000;
   padding: 5px;
   overflow-y: scroll;
-  height: 2.5rem;
+  height: 16vh;
   width: 100%;
 }
 
 #comment_section_row {
-  height: 70%;
+  height: 60%;
 }
 #comment_section{
   border: 1px solid #000000;
-  height: 55vh;
+  height: 40vh;
   overflow-y: scroll;
 }
 
-#add_comment_row, #cur_annotation_row{
+#add_comment_row{
   height: 15%;
-
 }
+#cur_annotation_row{
+  height: 25%;
+}
+
 #add_comment_btn, #add_comment_text{
   width: 100%;
 }
@@ -154,16 +159,14 @@
 }
 .col-3 {
   padding: 20px;
-  border: 2px solid #000000;
 }
 
 #annotation_pages{
-  border: 2px solid #000000;
   padding: 20px;
   height: 100vh;
 }
 #book_to_annotate{
-  height: 75vh;
+  height: 75%;
   overflow-y: scroll;
 }
 
