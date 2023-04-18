@@ -160,6 +160,7 @@ app.post('/login', async (req, res) => {
     });
 });
 
+
 app.get("/profile", (req, res) => {
   res.render("pages/profile", {
     username: req.session.user.username,
