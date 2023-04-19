@@ -160,8 +160,6 @@ app.post('/login', async (req, res) => {
 
     })
     .catch((err) => {
-      console.log(err);
-      //res.redirect("/register");
       res.render("pages/register", {
         error: true,
         message: "Username doesn't exist, please register",
@@ -180,10 +178,6 @@ app.post('/register', async (req,res) => {
 
   const username = req.body.username;
   const password = req.body.password;
-  // check for bad request
-  if(username == null || password == null){
-    throw new Error("missing username and/or password");
-  }
 
   //hash the password using bcrypt library
   const hashed_password = await bcrypt.hash(password, 10);
@@ -194,9 +188,13 @@ app.post('/register', async (req,res) => {
   try {
     await db.any(insert_sql);
     res.redirect(200, '/login');
-  } catch (error){
+  } 
+  catch (error){
     console.log(error)
-    res.redirect(300, '/register');
+    res.status(300).render("pages/register", {
+      error: true,
+      message: "Username already in use, please try with a different username",
+    })
   }
 });
 
