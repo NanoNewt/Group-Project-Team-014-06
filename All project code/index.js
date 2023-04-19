@@ -112,8 +112,11 @@ app.get('/class_notes', (req, res) => {
 
 
 app.get('/', (req, res) => {
-  res.json({status: 'success', message: 'Home Page!'}); //lab 11
-  res.render("pages/splash");
+  res.render("pages/splash",
+  {
+    status: 'success',
+    message: 'Home Page!'
+  });
 });
 
 //Lab 11 -- this is wrong to pass the negative case for lab 11.
