@@ -190,7 +190,6 @@ app.post('/register', async (req,res) => {
     res.redirect(200, '/login');
   } 
   catch (error){
-    console.log(error)
     res.status(300).render("pages/register", {
       error: true,
       message: "Username already in use, please try with a different username",
@@ -231,9 +230,13 @@ const auth = (req, res, next) => {
   }
   next();
 };
-
 // Authentication Required
 app.use(auth);
+
+app.get('/logout', (req,res)=> {
+  req.session.destroy();
+  res.render("pages/login", {message: 'Logged out Successfully'});
+})
 
 app.get("/profile", (req, res) => {
   res.render("pages/profile", {
