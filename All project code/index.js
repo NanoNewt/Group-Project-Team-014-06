@@ -170,17 +170,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get("/profile", (req, res) => {
-  res.render("pages/profile", {
-    username: req.session.user.username,
-    first_name: req.session.user.first_name,
-    last_name: req.session.user.last_name,
-    email: req.session.user.email,
-    year: req.session.user.year,
-    major: req.session.user.major,
-    degree: req.session.user.degree,
-  });
-});
+
 
 app.get('/register', (req, res) => {
   res.render("pages/register");
@@ -210,10 +200,6 @@ app.post('/register', async (req,res) => {
   }
 });
 
-app.get('/annotations', (req, res) => {
-  res.render("pages/annotations");
-});
-
 app.get('/biglogo', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'easyreads-big.png');
   res.sendFile(imagePath);
@@ -237,6 +223,34 @@ app.get('/classnotes_img', (req, res) => {
 app.get('/backsplash', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'backsplash.png');
   res.sendFile(imagePath);
+});
+
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
+};
+
+// Authentication Required
+app.use(auth);
+
+app.get("/profile", (req, res) => {
+  res.render("pages/profile", {
+    username: req.session.user.username,
+    first_name: req.session.user.first_name,
+    last_name: req.session.user.last_name,
+    email: req.session.user.email,
+    year: req.session.user.year,
+    major: req.session.user.major,
+    degree: req.session.user.degree,
+  });
+});
+
+app.get('/annotations', (req, res) => {
+  res.render("pages/annotations");
 });
 
 // *****************************************************
