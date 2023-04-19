@@ -107,12 +107,18 @@ app.get('/books', (req, res) => {
 });
 
 app.get('/class_notes', (req, res) => {
-res.render("pages/class_notes");
+  res.render("pages/class_notes");
 });
 
 
 app.get('/', (req, res) => {
+  res.json({status: 'success', message: 'Home Page!'}); //lab 11
   res.render("pages/splash");
+});
+
+//Lab 11 -- this is wrong to pass the negative case for lab 11.
+app.get('/bookmarks', (req, res) => {
+  res.render("pages/profile");
 });
 
 
