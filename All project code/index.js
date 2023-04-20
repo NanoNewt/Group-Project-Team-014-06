@@ -237,7 +237,7 @@ app.get('/books', async (req, res) => {
 
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch books' });
-}
+}});
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
