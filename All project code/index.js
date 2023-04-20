@@ -107,12 +107,21 @@ app.get('/books', (req, res) => {
 });
 
 app.get('/class_notes', (req, res) => {
-res.render("pages/class_notes");
+  res.render("pages/class_notes");
 });
 
 
 app.get('/', (req, res) => {
-  res.render("pages/splash");
+  res.render("pages/splash",
+  {
+    status: 'success',
+    message: 'Home Page!'
+  });
+});
+
+//Lab 11 -- this is wrong to pass the negative case for lab 11.
+app.get('/bookmarks', (req, res) => {
+  res.render("pages/profile");
 });
 
 
@@ -151,8 +160,6 @@ app.post('/login', async (req, res) => {
 
     })
     .catch((err) => {
-      console.log(err);
-      //res.redirect("/register");
       res.render("pages/register", {
         error: true,
         message: "Username doesn't exist, please register",
@@ -178,8 +185,6 @@ app.get('/profile', async (req, res) => {
 });
 
 
-
-
 app.get('/register', (req, res) => {
   res.render("pages/register");
 });
@@ -188,10 +193,6 @@ app.post('/register', async (req,res) => {
 
   const username = req.body.username;
   const password = req.body.password;
-  // check for bad request
-  if(username == null || password == null){
-    throw new Error("missing username and/or password");
-  }
 
   //hash the password using bcrypt library
   const hashed_password = await bcrypt.hash(password, 10);
@@ -202,14 +203,13 @@ app.post('/register', async (req,res) => {
   try {
     await db.any(insert_sql);
     res.redirect(200, '/login');
-  } catch (error){
-    console.log(error)
-    res.redirect(300, '/register');
+  } 
+  catch (error){
+    res.status(300).render("pages/register", {
+      error: true,
+      message: "Username already in use, please try with a different username",
+    })
   }
-});
-
-app.get('/annotations', (req, res) => {
-  res.render("pages/annotations");
 });
 
 app.get('/biglogo', (req, res) => {
@@ -235,6 +235,55 @@ app.get('/classnotes_img', (req, res) => {
 app.get('/backsplash', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'backsplash.png');
   res.sendFile(imagePath);
+});
+
+// Handle form submission
+app.get('/books', async (req, res) => {
+  try {
+    const search = req.query.search;
+
+    //api does not require key
+    const response = await axios.get(`https://gutendex.com/books/?search=${search}`);
+
+    const books = response.data.results;
+
+    res.render('pages/annotations', { data }); 
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch books' });
+}});
+
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
+};
+// Authentication Required
+app.use(auth);
+
+app.get('/logout', (req,res)=> {
+  req.session.destroy();
+  res.render("pages/login", {message: 'Logged out Successfully'});
+})
+
+app.get("/profile", (req, res) => {
+  res.render("pages/profile", {
+    username: req.session.user.username,
+    first_name: req.session.user.first_name,
+    last_name: req.session.user.last_name,
+    email: req.session.user.email,
+    year: req.session.user.year,
+    major: req.session.user.major,
+    degree: req.session.user.degree,
+  });
+});
+
+app.get('/annotations', (req, res) => {
+  res.render("pages/annotations");
 });
 
 // *****************************************************
