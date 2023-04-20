@@ -112,8 +112,16 @@ app.get('/class_notes', (req, res) => {
 
 
 app.get('/', (req, res) => {
+<<<<<<< HEAD
   // res.json({status: 'success', message: 'Home Page!'}); //lab 11
   res.render("pages/splash");
+=======
+  res.render("pages/splash",
+  {
+    status: 'success',
+    message: 'Home Page!'
+  });
+>>>>>>> 5a4879751888228eccb41c7f757497436bb4547b
 });
 
 //Lab 11 -- this is wrong to pass the negative case for lab 11.
@@ -157,8 +165,6 @@ app.post('/login', async (req, res) => {
 
     })
     .catch((err) => {
-      console.log(err);
-      //res.redirect("/register");
       res.render("pages/register", {
         error: true,
         message: "Username doesn't exist, please register",
@@ -167,17 +173,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get("/profile", (req, res) => {
-  res.render("pages/profile", {
-    username: req.session.user.username,
-    first_name: req.session.user.first_name,
-    last_name: req.session.user.last_name,
-    email: req.session.user.email,
-    year: req.session.user.year,
-    major: req.session.user.major,
-    degree: req.session.user.degree,
-  });
-});
+
 
 app.get('/register', (req, res) => {
   res.render("pages/register");
@@ -187,10 +183,6 @@ app.post('/register', async (req,res) => {
 
   const username = req.body.username;
   const password = req.body.password;
-  // check for bad request
-  if(username == null || password == null){
-    throw new Error("missing username and/or password");
-  }
 
   //hash the password using bcrypt library
   const hashed_password = await bcrypt.hash(password, 10);
@@ -201,14 +193,13 @@ app.post('/register', async (req,res) => {
   try {
     await db.any(insert_sql);
     res.redirect(200, '/login');
-  } catch (error){
-    console.log(error)
-    res.redirect(300, '/register');
+  } 
+  catch (error){
+    res.status(300).render("pages/register", {
+      error: true,
+      message: "Username already in use, please try with a different username",
+    })
   }
-});
-
-app.get('/annotations', (req, res) => {
-  res.render("pages/annotations");
 });
 
 app.get('/biglogo', (req, res) => {
@@ -252,6 +243,36 @@ app.get('/books', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch books' });
   }
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
+};
+// Authentication Required
+app.use(auth);
+
+app.get('/logout', (req,res)=> {
+  req.session.destroy();
+  res.render("pages/login", {message: 'Logged out Successfully'});
+})
+
+app.get("/profile", (req, res) => {
+  res.render("pages/profile", {
+    username: req.session.user.username,
+    first_name: req.session.user.first_name,
+    last_name: req.session.user.last_name,
+    email: req.session.user.email,
+    year: req.session.user.year,
+    major: req.session.user.major,
+    degree: req.session.user.degree,
+  });
+});
+
+app.get('/annotations', (req, res) => {
+  res.render("pages/annotations");
 });
 
 // *****************************************************
