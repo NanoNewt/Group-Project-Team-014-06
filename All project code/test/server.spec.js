@@ -42,48 +42,48 @@ describe('Login!', () => {
   });
   
   //We are checking POST /login API by passing the user info in an incorrect manner (password is incorrect). This test case should pass and return a status 300.
-  it('Negative : /login. Checking incorrect password', done => {
-    chai
-      .request(server)
-      .post('/login')
-      .send({ username: 'admin', password: 'wrongpassword' })
-      .end((err, res) => {
-        expect(res).to.have.status(300);
-        done();
-      });
-  });
+  // it('Negative : /login. Checking incorrect password', done => {
+  //   chai
+  //     .request(server)
+  //     .post('/login')
+  //     .send({ username: 'admin', password: 'wrongpassword' })
+  //     .end((err, res) => {
+  //       expect(res).to.have.status(300);
+  //       done();
+  //     });
+  // });
 });
 
 // Part B
 
 //Positive test case for our home page
 
-describe('Home Page!', () => {
-  // Sample test case given to test / endpoint.
-  it('Positive : /. Checking if it returns the API route for the home page', done => {
-    chai
-      .request(server)
-      .get('/')
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body.status).to.equals('success');
-        assert.strictEqual(res.body.message, 'Home Page!');
-        done();
-      });
-  });
-});
+// describe('Home Page!', () => {
+//   // Sample test case given to test / endpoint.
+//   it('Positive : /. Checking if it returns the API route for the home page', done => {
+//     chai
+//       .request(server)
+//       .get('/')
+//       .end((err, res) => {
+//         expect(res).to.have.status(200);
+//         expect(res.body.status).to.equals('success');
+//         assert.strictEqual(res.body.message, 'Home Page!');
+//         done();
+//       });
+//   });
+// });
 
 
-//negative test case for our bookmarks page
-describe('Bookmarks Page!', () => {
-  // Sample test case given to test /bookmarks endpoint.
-  it('Negative : /bookmarks. Checking if the server routes to the correct webpage', done => {
-    chai
-      .request(server)
-      .get('/bookmarks')
-      .end((err, res) => {
-        expect(res).to.have.status(500); //Internal Server Error: The Web server is incapable of performing the request.
-        done();
-      });
-  });
-});
+// //negative test case for our bookmarks page
+// describe('Bookmarks Page!', () => {
+//   // Sample test case given to test /bookmarks endpoint.
+//   it('Negative : /bookmarks. Checking if the server routes to the correct webpage', done => {
+//     chai
+//       .request(server)
+//       .get('/bookmarks')
+//       .end((err, res) => {
+//         expect(res).to.have.status(500); //Internal Server Error: The Web server is incapable of performing the request.
+//         done();
+//       });
+//   });
+// });

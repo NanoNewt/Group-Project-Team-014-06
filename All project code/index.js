@@ -112,7 +112,7 @@ app.get('/class_notes', (req, res) => {
 
 
 app.get('/', (req, res) => {
-  res.json({status: 'success', message: 'Home Page!'}); //lab 11
+  // res.json({status: 'success', message: 'Home Page!'}); //lab 11
   res.render("pages/splash");
 });
 
@@ -234,6 +234,24 @@ app.get('/classnotes_img', (req, res) => {
 app.get('/backsplash', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'backsplash.png');
   res.sendFile(imagePath);
+});
+
+// Handle form submission
+app.get('/books', async (req, res) => {
+  try {
+    const search = req.query.search;
+
+    //api does not require key
+    const response = await axios.get(`https://gutendex.com/books/?search=${search}`);
+
+    const books = response.data.results;
+
+    res.render('pages/annotations', { data }); 
+  } catch (error) {
+
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch books' });
+  }
 });
 
 // *****************************************************
