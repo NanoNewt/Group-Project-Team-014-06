@@ -289,6 +289,25 @@ app.get('/annotations', (req, res) => {
   res.render("pages/annotations");
 });
 
+app.get('create_annotation', async (req,res) => {
+  const book_id = req.body.book_id;
+  const page_number = req.body.page_number;
+  const start_index = req.body.start_index;
+  const end_index = req.body.end_index;
+
+  // Create insert sql
+  const cols = '(book_id,page_number,start_index,end_index)';
+  const vals = `(${book_id},${page_number},${start_index},${end_index})`;
+  const insert_sql = `INSERT INTO annotations ${cols} VALUES ${vals};`;
+
+  try {
+    const responce = await db.one(insert_sql);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
