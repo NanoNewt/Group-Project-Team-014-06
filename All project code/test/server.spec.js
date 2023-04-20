@@ -58,22 +58,6 @@ describe('Login!', () => {
 
 //Positive test case for our home page
 
-<<<<<<< HEAD
-// describe('Home Page!', () => {
-//   // Sample test case given to test / endpoint.
-//   it('Positive : /. Checking if it returns the API route for the home page', done => {
-//     chai
-//       .request(server)
-//       .get('/')
-//       .end((err, res) => {
-//         expect(res).to.have.status(200);
-//         expect(res.body.status).to.equals('success');
-//         assert.strictEqual(res.body.message, 'Home Page!');
-//         done();
-//       });
-//   });
-// });
-=======
 describe('Home Page!', () => {
   // Sample test case given to test / endpoint.
   it('Positive : /. Checking if it returns the API route for the home page', done => {
@@ -87,7 +71,6 @@ describe('Home Page!', () => {
       });
   });
 });
->>>>>>> 5a4879751888228eccb41c7f757497436bb4547b
 
 
 // //negative test case for our bookmarks page
