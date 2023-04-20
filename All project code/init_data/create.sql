@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS books CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS annotations;
 DROP TABLE IF EXISTS book_pages;
+DROP TABLE IF EXISTS comments;
+
 
 -- Create the users table
 CREATE TABLE users (
@@ -44,8 +46,21 @@ CREATE TABLE annotations (
     book_id INT REFERENCES books(id),
     page_number INT NOT NULL,
     start_index INT NOT NULL,
-    end_index INT NOT NULL,
+    end_index INT NOT NULL
+);
+
+-- Create the comments table
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    annotation_id INT REFERENCES annotations(id),
     comment TEXT NOT NULL
+);
+
+-- Create the annotation_to_comments table
+CREATE TABLE annotation_to_comments (
+    annotation_id INT REFERENCES annotations(id),
+    comment_id INT REFERENCES comments(id)
 );
 
 -- Create the user_to_books table
@@ -68,6 +83,7 @@ CREATE TABLE books_to_annotation (
     annotation_id INT REFERENCES annotations(id),
     PRIMARY KEY(book_id, annotation_id)
 );
+
 
 
 
