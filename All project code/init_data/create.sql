@@ -57,4 +57,22 @@ CREATE TABLE comments (
     comment TEXT NOT NULL
 );
 
+-- Create the book_pages table
+CREATE TABLE book_pages (
+    id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(id),
+    page_number INT NOT NULL,
+    page_content TEXT NOT NULL
+);
+
+-- Create the annotations table
+CREATE TABLE annotations (
+    id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(id),
+    page_number INT NOT NULL,
+    start_index INT NOT NULL,
+    end_index INT NOT NULL,
+    comment TEXT NOT NULL
+);
+
 INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6');
