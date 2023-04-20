@@ -1,8 +1,6 @@
-<%- include ('../partials/head') %>
-<%- include ('../partials/menu') %>
 <main>
   <div class="container">
-    <h1><centre>Welcome User : <%= user.username %></centre></h1>
+    <h1><center>Welcome User: <%= user.username %></center></h1>
     <table class="table">
       <tbody>
         <tr>
@@ -31,18 +29,18 @@
         </tr>
       </tbody>
     </table>
+
     <h2>Favorite Books</h2>
     <ul>
-      <% for (const book of favorite_books) { %>
+      <% books.forEach(function(book) { %>
         <li><%= book.title %> by <%= book.author %></li>
-      <% } %>
+      <% }) %>
     </ul>
 
-    <h2>My Annotation</h2>
-    <ul>
-      <% for (const comment of my_comments) { %>
-        <li><%= comment.text %> (on <%= comment.Book.title %>)</li>
-      <% } %>
-    </ul>
+    <h2>Annotations</h2>
+    <% annotations.forEach(function(annotation) { %>
+      <h4><%= annotation.title %> - Page <%= annotation.page_number %></h4>
+      <p><%= annotation.comment %></p>
+    <% }) %>
+  </div>
 </main>
-<%- include ('../partials/footer') %>
