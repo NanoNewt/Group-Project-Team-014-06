@@ -168,6 +168,21 @@ app.post('/login', async (req, res) => {
 });
 
 
+app.get('/profile', async (req, res) => {
+  try {
+    const user = req.session.user;
+    const favorite_books = await Book.findAll({ 
+      where: { id: { [Op.in]: Sequelize.literal(`(SELECT book_id FROM user_to_book WHERE user_id = ${user.id})`) } } 
+    });
+    const my_comments = await Comment.findAll({ 
+      where: { user_id: user.id } 
+    });
+    res.render('pages/profile', { user, favorite_books, my_comments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal server error');
+  }
+});
 
 
 app.get('/register', (req, res) => {

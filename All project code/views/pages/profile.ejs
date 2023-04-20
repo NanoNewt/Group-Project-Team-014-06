@@ -1,36 +1,48 @@
-<%- include ('../partials/head') %> <%- include ('../partials/menu') %>
+<%- include ('../partials/head') %>
+<%- include ('../partials/menu') %>
 <main>
   <div class="container">
-    <h1><centre>Welcome User : <%= username %></centre></h1>
+    <h1><centre>Welcome User : <%= user.username %></centre></h1>
     <table class="table">
-        <tbody>
-          <tr>
-            <td>FIRST NAME</td>
-            <td><%= first_name %></td>
-          </tr>
-          <tr>
-            <td>LAST NAME</td>
-            <td><%= last_name %></td>
-          </tr>
-          <tr>
-            <td>EMAIL</td>
-            <td><%= email %></td>
-          </tr>
-          <tr>
-            <td>YEAR</td>
-            <td><%= year %></td>
-          </tr>
-          <tr>
-            <td>MAJOR</td>
-            <td><%= major %></td>
-          </tr>
-          <tr>
-            <td>DEGREE</td>
-            <td><%= degree %></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-</main>
+      <tbody>
+        <tr>
+          <td>FIRST NAME</td>
+          <td><%= user.first_name %></td>
+        </tr>
+        <tr>
+          <td>LAST NAME</td>
+          <td><%= user.last_name %></td>
+        </tr>
+        <tr>
+          <td>EMAIL</td>
+          <td><%= user.email %></td>
+        </tr>
+        <tr>
+          <td>YEAR</td>
+          <td><%= user.year %></td>
+        </tr>
+        <tr>
+          <td>MAJOR</td>
+          <td><%= user.major %></td>
+        </tr>
+        <tr>
+          <td>DEGREE</td>
+          <td><%= user.degree %></td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Favorite Books</h2>
+    <ul>
+      <% for (const book of favorite_books) { %>
+        <li><%= book.title %> by <%= book.author %></li>
+      <% } %>
+    </ul>
 
+    <h2>My Annotation</h2>
+    <ul>
+      <% for (const comment of my_comments) { %>
+        <li><%= comment.text %> (on <%= comment.Book.title %>)</li>
+      <% } %>
+    </ul>
+</main>
 <%- include ('../partials/footer') %>
