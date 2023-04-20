@@ -12,12 +12,12 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password CHAR(60) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    year INT NOT NULL,
-    major VARCHAR(255) NOT NULL,
-    degree VARCHAR(255) NOT NULL
+    first_name VARCHAR(50) NULL,
+    last_name VARCHAR(50) NULL,
+    email VARCHAR(255) NULL,
+    year INT NULL,
+    major VARCHAR(255) NULL,
+    degree VARCHAR(255) NULL
 );
 
 -- Create the books table

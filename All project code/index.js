@@ -210,7 +210,7 @@ app.post('/register', async (req,res) => {
   catch (error){
     res.status(300).render("pages/register", {
       error: true,
-      message: "Username already in use, please try with a different username",
+      message: "Insertion Error",
     })
   }
 });
