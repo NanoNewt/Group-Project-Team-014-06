@@ -132,7 +132,6 @@ app.get('/login', (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-  const password = req.body.password;
   const username = req.body.username;
   const query = "select * from users where username = $1";  
   const values = [username];
@@ -144,10 +143,10 @@ app.post('/login', async (req, res) => {
       const match = bcrypt.compare(req.body.password, user.password);
 
       match.then(function(result){
-        if(result){
+        if(result){ // Succesful
           req.session.user = user;
           req.session.save();
-          res.redirect("/");
+          res.redirect("/literature");
         }
         else{
           console.log("Incorrect username or password.");
