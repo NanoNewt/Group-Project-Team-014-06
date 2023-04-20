@@ -53,7 +53,7 @@ CREATE TABLE books (
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
     book_id INT REFERENCES books(id),
-    user_id VARCHAR(50) REFERENCES users(username),
+    user_id INT REFERENCES users(id),
     comment TEXT NOT NULL
 );
 
