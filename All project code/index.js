@@ -168,21 +168,25 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get('/profile', async (req, res) => {
+app.get("/profile", async (req, res) => {
   try {
-    const user = req.session.user;
-    const favorite_books = await books.findAll({ 
-      where: { id: { [Op.in]: Sequelize.literal(`(SELECT book_id FROM user_to_book WHERE user_id = ${user.id})`) } } 
+    const userId = req.session.user.id;
+    
+    const user = await pool.query("SELECT * FROM users WHERE id = $1", [userId]);
+    const books = await pool.query("SELECT b.* FROM user_to_books ub INNER JOIN books b ON ub.book_id = b.id WHERE ub.user_id = $1", [userId]);
+    const annotations = await pool.query("SELECT a.*, b.title FROM user_to_annotation ua INNER JOIN annotations a ON ua.annotation_id = a.id INNER JOIN books b ON a.book_id = b.id WHERE ua.user_id = $1", [userId]);
+
+    res.render("pages/profile", {
+      user: user.rows[0],
+      books: books.rows,
+      annotations: annotations.rows,
     });
-    const my_comments = await comments.findAll({ 
-      where: { user_id: user.id } 
-    });
-    res.render('pages/profile', { user, favorite_books, my_comments });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Internal server error');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
   }
 });
+
 
 
 app.get('/register', (req, res) => {
