@@ -112,16 +112,11 @@ app.get('/class_notes', (req, res) => {
 
 
 app.get('/', (req, res) => {
-<<<<<<< HEAD
-  // res.json({status: 'success', message: 'Home Page!'}); //lab 11
-  res.render("pages/splash");
-=======
   res.render("pages/splash",
   {
     status: 'success',
     message: 'Home Page!'
   });
->>>>>>> 5a4879751888228eccb41c7f757497436bb4547b
 });
 
 //Lab 11 -- this is wrong to pass the negative case for lab 11.
@@ -242,7 +237,8 @@ app.get('/books', async (req, res) => {
 
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch books' });
-  }
+}
+
 // Authentication Middleware.
 const auth = (req, res, next) => {
   if (!req.session.user) {
