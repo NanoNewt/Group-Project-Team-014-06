@@ -332,10 +332,28 @@ app.get('/create_annotation', async (req,res) => {
 app.get('/get_annotation_comments', async (req,res) => {
   const annotation_id = req.params.id;
 
-  const query = `SELECT * FROM comments WHERE annotation_id = ${annotation_id}`;
+  const query = `SELECT * FROM comments WHERE annotation_id = ${annotation_id};`;
 
   try {
     const responce = await db.any(query);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get('/add_comment', async (req,res) => {
+  const annotation_id = req.body.annotation_id;
+  const comment_text = req.body.comment_text;
+  const user_id = req.session.user.id;
+
+  // Create insert sql
+  const cols = '(user_id,annotation_id,comment)';
+  const vals = `(${user_id},${annotation_id},${comment_text})`;
+  const query = `INSERT INTO annotations ${cols} VALUES ${vals};`;
+
+  try {
+    const responce = await db.one(query);
     res.send(responce);
   } catch (error) {
     console.log(error);
