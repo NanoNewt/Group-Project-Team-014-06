@@ -62,11 +62,6 @@ app.use(
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
-const books = {
-  name: 'b1',
-  author: 'a1',
-  genre: 'g1',
-};
 
 // Lab 11
 
