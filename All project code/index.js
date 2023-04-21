@@ -99,12 +99,12 @@ app.get('/literature', (req, res) => {
   res.render("pages/literature");
 });
 
-app.get('/books', (req, res) => {
-  res.render("pages/books", {
-    // books: ['b1', 'a1', 'g1'],
-  });
-  // console.log(books);
-});
+// app.get('/books', (req, res) => {
+//   res.render("pages/books", {
+//     // books: ['b1', 'a1', 'g1'],
+//   });
+//   // console.log(books);
+// });
 
 app.get('/class_notes', (req, res) => {
   res.render("pages/class_notes");
@@ -223,21 +223,47 @@ app.get('/backsplash', (req, res) => {
 });
 
 // Handle form submission
-app.get('/books', async (req, res) => {
+app.get('/books', async (req, res) => { 
+
   try {
-    const search = req.query.search;
-
     //api does not require key
-    const response = await axios.get(`https://gutendex.com/books/?search=${search}`);
+    var search = req.query.search;
 
-    const books = response.data.results;
+    if(!search){
+      var response = await axios.get(`https://gutendex.com/books/`);
+    }else{
+      var response = await axios.get(`https://gutendex.com/books/?search=${search}`);
+    }
+    
+    var books = response.data.results;
+    res.render('pages/books', { books }); 
 
-    res.render('pages/annotations', { data }); 
   } catch (error) {
 
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch books' });
 }});
+
+app.get('/books/:id', async (req, res) => {
+  try {
+    const bookId = req.params.id;
+    const url = `http://www.gutenberg.org/files/${bookId}/${bookId}-0.txt`;
+    const response = await axios.get(url);
+    const book = {
+      contents: response.data,
+      id: bookId
+    };
+
+    if (req.query.currentPage) {
+      currentPage = parseInt(req.query.currentPage);
+    }
+
+    res.render('pages/books', { book, currentPage });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch book contents' });
+  }
+});
 
 // Authentication Middleware.
 const auth = (req, res, next) => {
