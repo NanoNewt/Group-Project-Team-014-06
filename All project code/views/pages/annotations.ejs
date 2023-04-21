@@ -2,107 +2,7 @@
 
 
 
-<script>
-  let annotations = [];
-  let cur_annotation;
 
-  const BOOK_ID = 1;
-
-  function set_cur_annotation(id){
-    cur_annotation = annotations.find(ann => {return ann.id == id});
-    refresh_comments();
-  }
-
-  function removeAllChildren(node){
-    while(node.hasChildNodes()){
-      node.removeChild(node.firstChild);
-    }
-  }
-
-  function add_comment(text){
-    // FIX ME: Push comment to database
-    cur_annotation.comments.push(text);
-    refresh_comments();
-  }
-
-  function largest_id(array){
-    let largest = -1;
-    array.forEach(element => {
-      if(element.id > largest){
-        largest = element.id;
-      }
-    });
-    return largest;
-  }
-
-  function refresh_comments(){
-    const comments_section = document.querySelector('#comment_section');
-    const annotation_box = document.querySelector('#current_annotation_box');
-
-    //clear old comments
-    removeAllChildren(comments_section);
-
-    //refresh annotation_box
-    if(cur_annotation.text_elm.innerHTML == null){
-      annotation_box.innerHTML = "none";
-      return;
-    }
-    annotation_box.innerHTML = cur_annotation.text_elm.innerHTML;
-
-    //display this annotated text's comments
-      // FIX ME: query database for what comments this annotation has
-
-    cur_annotation.comments.forEach(comment => {
-      new_comment = document.createElement('div');
-      new_comment.classList.add('card');
-      new_comment.classList.add('comment');
-      new_comment.innerHTML = comment;
-
-      comments_section.appendChild(new_comment);
-    });
-  }
-
-  function create_annotation(){
-    /*const request = new Request('/create_annotation', {
-      method: "GET",
-      body: {
-        book_id: BOOK_ID,
-        page_number: 0, //FIX ME: PLACEHOLDER
-        start_index: 0, //FIX ME: PLACEHOLDER
-        end_index: 0 //FIX ME: PLACEHOLDER
-      }
-    });*/
-
-
-    new_annotation = {
-      id:largest_id(annotations) + 1,
-      text_elm: highlightText(),
-      comments: [],
-      start_index: 0, //FIX ME: PLACEHOLDER
-      end_index: 0 //FIX ME: PLACEHOLDER
-    };
-    // FIX ME: Push annotation to database
-    annotations.push(new_annotation);
-    console.log(new_annotation);
-    new_annotation.text_elm.setAttribute('onclick', `set_cur_annotation(${new_annotation.id})`);
-    cur_annotation = new_annotation;
-    refresh_comments()
-  }
-
-  function highlightText() {
-    var selection = window.getSelection();
-    if (selection.rangeCount) {
-      var range = selection.getRangeAt(0).cloneRange();
-      var highlight = document.createElement('span');
-      highlight.classList.add('highlight');
-      range.surroundContents(highlight);
-      selection.removeAllRanges();
-      selection.addRange(range);
-      return highlight;  
-    }
-  }
-
-</script>
 
 <%- include ('../partials/menu') %>
 <main> 
@@ -133,6 +33,135 @@
   </div>
 </main>
 <%- include ('../partials/footer') %>
+
+<script>
+  let annotations = [];
+  let cur_annotation;
+  let page_number = 1; //FIX ME: placeholder
+  let page;
+  let chars_in_page;
+  const BOOK_ID = 1;
+
+
+  document.querySelector("main").onload = onload_test();
+
+  function onload_test(){
+    let page = document.getElementById('book_to_annotate');
+    let chars_in_page = page.innerHTML.length;
+  }
+
+  function set_cur_annotation(id){
+    cur_annotation = annotations.find(ann => {return ann.id == id});
+    refresh_comments();
+  }
+
+  function removeAllChildren(node){
+    while(node.hasChildNodes()){
+      node.removeChild(node.firstChild);
+    }
+  }
+
+  function add_comment(text){
+    // FIX ME: Push comment to database
+    cur_annotation.comments.push(text);
+    refresh_comments();
+  }
+
+  function largest_id(array){
+    let largest = -1;
+    array.forEach(element => {
+      if(element.id > largest){
+        largest = element.id;
+      }
+    });
+    return largest;
+  }
+
+  function refresh_comments(){
+    const comments_section = document.getElementById('comment_section');
+    const annotation_box = document.getElementById('current_annotation_box');
+
+    //clear old comments
+    removeAllChildren(comments_section);
+
+    //refresh annotation_box
+    if(cur_annotation.text_elm.innerHTML == null){
+      annotation_box.innerHTML = "none";
+      return;
+    }
+    annotation_box.innerHTML = cur_annotation.text_elm.innerHTML;
+
+    //display this annotated text's comments
+      // FIX ME: query database for what comments this annotation has
+
+    cur_annotation.comments.forEach(comment => {
+      new_comment = document.createElement('div');
+      new_comment.classList.add('card');
+      new_comment.classList.add('comment');
+      new_comment.innerHTML = comment;
+
+      comments_section.appendChild(new_comment);
+    });
+  }
+
+  function create_annotation(){
+    console.log("creating annotations");
+    const highlightResponce = highlightText();
+    var new_annotation;
+    fetch('/create_annotation', {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        book_id: BOOK_ID,
+        page_number: page_number,
+        start_index: highlightResponce.start_index, 
+        end_index: highlightResponce.end_index 
+      })
+    })
+    .then(responce => {
+      responce.json().then( (result) =>{
+        new_annotation = {
+          id:result.id,
+          text_elm: highlightResponce.text_elm,
+          comments: [],
+          start_index: result.start_index, 
+          end_index: result.end_index 
+        };
+      
+        annotations.push(new_annotation);
+        new_annotation.text_elm.setAttribute('onclick', `set_cur_annotation(${new_annotation.id})`);
+        cur_annotation = new_annotation;
+        refresh_comments()
+      });
+    });
+  }
+
+  function highlightText() {
+    var selection = window.getSelection();
+    if (selection.rangeCount) {
+      var range = selection.getRangeAt(0).cloneRange();
+      var highlight = document.createElement('span');
+      highlight.classList.add('highlight');
+      range.surroundContents(highlight);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return {
+        text_elm: highlight,
+        start_index: range.startOffset, //FIX ME: PLACEHOLDER
+        end_index: range.endOffset //FIX ME: PLACEHOLDER
+      };
+      //Range.endOffset account for other highlights
+      //Range.startOffset  account for other highlights
+    }
+  }
+
+  
+
+</script>
+
 <style>
 
 

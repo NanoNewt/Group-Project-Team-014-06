@@ -310,7 +310,8 @@ app.get('/annotations', (req, res) => {
   res.render("pages/annotations");
 });
 
-app.get('/create_annotation', async (req,res) => {
+app.post('/create_annotation', async (req,res) => {
+  console.log(req.body);
   const book_id = req.body.book_id;
   const page_number = req.body.page_number;
   const start_index = req.body.start_index;
@@ -319,7 +320,7 @@ app.get('/create_annotation', async (req,res) => {
   // Create insert sql
   const cols = '(book_id,page_number,start_index,end_index)';
   const vals = `(${book_id},${page_number},${start_index},${end_index})`;
-  const insert_sql = `INSERT INTO annotations ${cols} VALUES ${vals};`;
+  const insert_sql = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
 
   try {
     const responce = await db.one(insert_sql);
@@ -347,14 +348,16 @@ app.get('/add_comment', async (req,res) => {
   const comment_text = req.body.comment_text;
   const user_id = req.session.user.id;
 
-  // Create insert sql
+  // Create query
   const cols = '(user_id,annotation_id,comment)';
   const vals = `(${user_id},${annotation_id},${comment_text})`;
-  const query = `INSERT INTO annotations ${cols} VALUES ${vals};`;
+  const query = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
 
+  // Send query
   try {
     const responce = await db.one(query);
-    res.send(responce);
+    console.log(responce);
+    res.json(responce);
   } catch (error) {
     console.log(error);
   }
