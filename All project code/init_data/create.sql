@@ -88,3 +88,5 @@ CREATE TABLE books_to_annotation (
 
 
 INSERT INTO users (username, password, first_name, last_name, email, year, major,degree) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6','test','test','test','2023','math','junior');
+INSERT INTO books (title,author,genre,description) VALUES ('test title', 'test author', 'test genere', 'test desciption');
+INSERT INTO book_pages (book_id,page_number,page_content) VALUES (1,1,'the giant spider jumped over the moss.');

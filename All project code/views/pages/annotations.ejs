@@ -3,9 +3,10 @@
 
 
 <script>
-  //FIX ME: MAKE FOOTER NOT COVER ADD COMMENT BUTTON
   let annotations = [];
   let cur_annotation;
+
+  const BOOK_ID = 1;
 
   function set_cur_annotation(id){
     cur_annotation = annotations.find(ann => {return ann.id == id});
@@ -38,16 +39,15 @@
     const comments_section = document.querySelector('#comment_section');
     const annotation_box = document.querySelector('#current_annotation_box');
 
+    //clear old comments
+    removeAllChildren(comments_section);
+
     //refresh annotation_box
     if(cur_annotation.text_elm.innerHTML == null){
       annotation_box.innerHTML = "none";
       return;
     }
     annotation_box.innerHTML = cur_annotation.text_elm.innerHTML;
-
-    //clear old comments
-    removeAllChildren(comments_section);
-
 
     //display this annotated text's comments
       // FIX ME: query database for what comments this annotation has
@@ -63,10 +63,23 @@
   }
 
   function create_annotation(){
+    /*const request = new Request('/create_annotation', {
+      method: "GET",
+      body: {
+        book_id: BOOK_ID,
+        page_number: 0, //FIX ME: PLACEHOLDER
+        start_index: 0, //FIX ME: PLACEHOLDER
+        end_index: 0 //FIX ME: PLACEHOLDER
+      }
+    });*/
+
+
     new_annotation = {
       id:largest_id(annotations) + 1,
       text_elm: highlightText(),
-      comments: []
+      comments: [],
+      start_index: 0, //FIX ME: PLACEHOLDER
+      end_index: 0 //FIX ME: PLACEHOLDER
     };
     // FIX ME: Push annotation to database
     annotations.push(new_annotation);

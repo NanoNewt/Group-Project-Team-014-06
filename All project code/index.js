@@ -310,7 +310,7 @@ app.get('/annotations', (req, res) => {
   res.render("pages/annotations");
 });
 
-app.get('create_annotation', async (req,res) => {
+app.get('/create_annotation', async (req,res) => {
   const book_id = req.body.book_id;
   const page_number = req.body.page_number;
   const start_index = req.body.start_index;
@@ -328,6 +328,20 @@ app.get('create_annotation', async (req,res) => {
     console.log(error);
   }
 });
+
+app.get('/get_annotation_comments', async (req,res) => {
+  const annotation_id = req.params.id;
+
+  const query = `SELECT * FROM comments WHERE annotation_id = ${annotation_id}`;
+
+  try {
+    const responce = await db.any(query);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
