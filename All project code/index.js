@@ -62,11 +62,7 @@ app.use(
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
-const books = {
-  name: 'b1',
-  author: 'a1',
-  genre: 'g1',
-};
+let currentPage = 1;
 
 // Lab 11
 
@@ -108,12 +104,12 @@ app.get('/literature', (req, res) => {
   res.render("pages/literature");
 });
 
-app.get('/books', (req, res) => {
-  res.render("pages/books", {
-    // books: ['b1', 'a1', 'g1'],
-  });
-  // console.log(books);
-});
+// app.get('/books', (req, res) => {
+//   res.render("pages/books", {
+//     // books: ['b1', 'a1', 'g1'],
+//   });
+//   // console.log(books);
+// });
 
 app.get('/class_notes', (req, res) => {
   res.render("pages/class_notes");
@@ -134,6 +130,10 @@ app.get('/bookmarks', (req, res) => {
 });
 
 
+app.get('/singlebook', (req, res) => {
+  res.render("pages/singlebook");
+});
+
 //login
 app.get('/login', (req, res) => {
   res.render("pages/login");
@@ -141,7 +141,6 @@ app.get('/login', (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-  const password = req.body.password;
   const username = req.body.username;
   const query = "select * from users where username = $1";  
   const values = [username];
@@ -153,10 +152,10 @@ app.post('/login', async (req, res) => {
       const match = bcrypt.compare(req.body.password, user.password);
 
       match.then(function(result){
-        if(result){
+        if(result){ // Succesful
           req.session.user = user;
           req.session.save();
-          res.redirect("/");
+          res.redirect("/literature");
         }
         else{
           console.log("Incorrect username or password.");
@@ -258,7 +257,7 @@ app.post('/register', async (req,res) => {
   catch (error){
     res.status(300).render("pages/register", {
       error: true,
-      message: "Username already in use, please try with a different username",
+      message: "Insertion Error",
     })
   }
 });
@@ -289,21 +288,58 @@ app.get('/backsplash', (req, res) => {
 });
 
 // Handle form submission
-app.get('/books', async (req, res) => {
+app.get('/books', async (req, res) => { 
+
   try {
-    const search = req.query.search;
-
     //api does not require key
-    const response = await axios.get(`https://gutendex.com/books/?search=${search}`);
+    var search = req.query.search;
 
-    const books = response.data.results;
+    if(!search){
+      var response = await axios.get(`https://gutendex.com/books/`);
+    }else{
+      var response = await axios.get(`https://gutendex.com/books/?search=${search}`);
+    }
+    
+    var books = response.data.results;
+    res.render('pages/books', { books }); 
 
-    res.render('pages/annotations', { data }); 
   } catch (error) {
 
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch books' });
 }});
+
+app.get('/singlebook/:id', async (req, res) => {
+  try {
+    const bookId = req.params.id;
+    const url = `http://www.gutenberg.org/files/${bookId}/${bookId}-0.txt`;
+    const response = await axios.get(url);
+    const book = {
+      contents: response.data,
+      id: bookId
+    };
+
+    if (req.query.currentPage) {
+      currentPage = parseInt(req.query.currentPage);
+    }
+
+    res.render('pages/singlebook', { book, currentPage });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch book contents' });
+  }
+});
+
+app.get('/changePage/:id/:pagenum', (req, res) => {
+  currentPage = parseInt(req.params.pagenum, 10);
+
+  if (currentPage < 1) {
+    currentPage = 1;
+  }
+  
+  const bookId = req.params.id;
+  res.redirect(`/singlebook/${bookId}`);
+});
 
 // Authentication Middleware.
 const auth = (req, res, next) => {

@@ -6,18 +6,20 @@ DROP TABLE IF EXISTS books CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS annotations;
 DROP TABLE IF EXISTS book_pages;
+DROP TABLE IF EXISTS comments;
+
 
 -- Create the users table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password CHAR(60) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    year INT NOT NULL,
-    major VARCHAR(255) NOT NULL,
-    degree VARCHAR(255) NOT NULL
+    first_name VARCHAR(50) NULL,
+    last_name VARCHAR(50) NULL,
+    email VARCHAR(255) NULL,
+    year INT NULL,
+    major VARCHAR(255) NULL,
+    degree VARCHAR(255) NULL
 );
 
 -- Create the books table
@@ -44,8 +46,21 @@ CREATE TABLE annotations (
     book_id INT REFERENCES books(id),
     page_number INT NOT NULL,
     start_index INT NOT NULL,
-    end_index INT NOT NULL,
+    end_index INT NOT NULL
+);
+
+-- Create the comments table
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    annotation_id INT REFERENCES annotations(id),
     comment TEXT NOT NULL
+);
+
+-- Create the annotation_to_comments table
+CREATE TABLE annotation_to_comments (
+    annotation_id INT REFERENCES annotations(id),
+    comment_id INT REFERENCES comments(id)
 );
 
 -- Create the user_to_books table
@@ -71,5 +86,6 @@ CREATE TABLE books_to_annotation (
 
 
 
-INSERT INTO users (username, password, first_name, last_name, email, year, major,degree) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6','test','test','test','2023','math','junior');
 INSERT INTO users (username, password, first_name, last_name, email, year, major,degree) VALUES ('test','test','test','test','test','2023','math','junior');
+INSERT INTO users (username, password, first_name, last_name, email, year, major,degree) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6','test','test','test','2023','math','junior');
+

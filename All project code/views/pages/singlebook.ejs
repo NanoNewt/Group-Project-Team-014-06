@@ -1,0 +1,55 @@
+<%- include ('../partials/head') %>
+<%- include ('../partials/menu') %>
+
+<main>
+    <div>
+      <% try {
+        const m = 30; //change this variable to alter # lines rendered per page
+        const startLine = (currentPage - 1) * m;
+        const endLine = startLine + m;
+        const page1 = book.contents.split('\n').slice(startLine, endLine).join('');
+        const page2 = book.contents.split('\n').slice(startLine+m, endLine+m).join('');
+
+      %>
+      <div style="display: flex; justify-content: center; padding: 20px;">
+        <pre style="padding-left: 5px; padding-right: 10px; border-left: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black;"><%= page1 %></pre>
+        <pre style="padding-left: 10px; padding-right: 5px; border-right: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black;"><%= page2 %></pre>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <b>Page <%=currentPage%>/<%=currentPage + 1%></b>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <form style="padding: 2px" method="GET" action="/books">
+          <button class="btn btn-warning" type="submit">Back</button>
+        </form>
+        <form style="padding: 2px" method="GET" action="/changePage/<%=book.id%>/<%=currentPage-1%>">
+          <button class="btn btn-primary" type="submit">Prev Page</button>
+        </form>
+        
+        <form style="padding: 2px" method="GET" action="/changePage/<%=book.id%>/<%=currentPage+1%>">
+          <button class="btn btn-primary" type="submit">Next Page</button>
+        </form>
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <form style="padding: 2px" method="GET" id="skipToForm">
+          <button class="btn btn-info" type="button" onclick="skipTo()">Skip to</button>
+          <input style="width: 40px"pattern="[0-9]+" type="text" id="skipToInput" name="skipToPage">
+        </form>
+      </div>
+      <% } catch (error) { %>
+        <p>Error: <%= error.message %></p>
+      <% } %>
+    </div>
+</main>
+  
+<script>
+    function skipTo() {
+      var form = document.getElementById('skipToForm');
+      var input = document.getElementById('skipToInput');
+      var value = input.value;
+      form.action = '/changePage/<%=book.id%>/' + value;
+      form.submit();
+    }
+</script>
+
+<%- include ('../partials/footer') %>
