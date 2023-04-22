@@ -364,8 +364,7 @@ app.get('/get_annotation_comments', async (req,res) => {
     console.log(error);
   }
 });
-
-app.get('/add_comment', async (req,res) => {
+app.post('/add_comment', async (req,res) => {
   const annotation_id = req.body.annotation_id;
   const comment_text = req.body.comment_text;
   const user_id = req.session.user.id;
@@ -380,6 +379,21 @@ app.get('/add_comment', async (req,res) => {
     const responce = await db.one(query);
     console.log(responce);
     res.json(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
+  const book_id = req.body.book_id;
+  const page_number = req.body.page_number;
+  
+
+  const query = `SELECT * FROM book_pages WHERE (book_id = ${book_id}) AND (page_number = ${page_number});`;
+
+  try {
+    const responce = await db.one(query);
+    res.send(responce);
   } catch (error) {
     console.log(error);
   }

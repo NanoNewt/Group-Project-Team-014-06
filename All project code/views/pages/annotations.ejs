@@ -40,7 +40,7 @@
   let cur_annotation;
   let page;
   let chars_in_page;
-
+  let page_contents;
   const PAGE_NUMBER = <%= page_number  %>;
   const BOOK_ID = <%= book_id  %>;
 
@@ -49,8 +49,25 @@
   document.querySelector("main").onload = onload_test();
 
   function onload_test(){
-    let page = document.getElementById('book_to_annotate');
-    let chars_in_page = page.innerHTML.length;
+    // get book contents
+    fetch('/bookPage_from_bookID_and_pageNumber', {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        book_id: BOOK_ID,
+        page_number: PAGE_NUMBER, 
+      })
+    })
+    .then(responce => {
+      console.log(responce);
+      responce.json().then( (result) =>{
+        page_contents = results.page_content;
+        getElementById('book_to_annotate').innerHTML = page_contents;
+      });
+    });
   }
 
   function set_cur_annotation(id){
