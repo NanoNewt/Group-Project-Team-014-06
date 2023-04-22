@@ -4,11 +4,14 @@
 
 <main>
   <div>
-    <form action="/books" method="GET">
-      <label for="search">Search:</label>
-      <input type="text" id="search" name="search">
-      <button type="submit">Submit</button>
-    </form>
+    <div stlye="width: 200px">
+      <form stlye="width: 200px" action="/books" method="GET">
+        <div stlye="width: 200px" class="input-group">
+          <input stlye="width: 200px"type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+          <button type="submit" class="btn btn-outline-primary">search</button>
+        </div>
+      </form>
+    </div>
     <% try { %>
         <% var i = 0 %>
         <% books.forEach(function(book) { %>

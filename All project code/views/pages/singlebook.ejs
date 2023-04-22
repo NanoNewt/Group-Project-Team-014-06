@@ -7,13 +7,16 @@
         const m = 30; //change this variable to alter # lines rendered per page
         const startLine = (currentPage - 1) * m;
         const endLine = startLine + m;
-        const lines = book.contents.split('\n').slice(startLine, endLine).join('');
+        const page1 = book.contents.split('\n').slice(startLine, endLine).join('');
+        const page2 = book.contents.split('\n').slice(startLine+m, endLine+m).join('');
+
       %>
       <div style="display: flex; justify-content: center; padding: 20px;">
-        <pre><%= lines %></pre>
+        <pre style="padding-left: 5px; padding-right: 10px; border-left: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black;"><%= page1 %></pre>
+        <pre style="padding-left: 10px; padding-right: 5px; border-right: 1px solid black; border-top: 1px solid black; border-bottom: 1px solid black;"><%= page2 %></pre>
       </div>
       <div style="display: flex; justify-content: center;">
-        <b>Page <%=currentPage%></b>
+        <b>Page <%=currentPage%>/<%=currentPage + 1%></b>
       </div>
       <div style="display: flex; justify-content: center;">
         <form style="padding: 2px" method="GET" action="/books">
