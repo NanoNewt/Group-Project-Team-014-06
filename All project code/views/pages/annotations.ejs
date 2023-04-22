@@ -34,15 +34,18 @@
 </main>
 <%- include ('../partials/footer') %>
 
+<% var test = 101; %>
 <script>
   let annotations = [];
   let cur_annotation;
-  let page_number = 1; //FIX ME: placeholder
   let page;
   let chars_in_page;
-  const BOOK_ID = 1;
 
+  const PAGE_NUMBER = <%= page_number  %>;
+  const BOOK_ID = <%= book_id  %>;
 
+  console.log(BOOK_ID);
+  console.log(PAGE_NUMBER);
   document.querySelector("main").onload = onload_test();
 
   function onload_test(){
@@ -116,7 +119,7 @@
       },
       body: JSON.stringify({
         book_id: BOOK_ID,
-        page_number: page_number,
+        page_number: PAGE_NUMBER,
         start_index: highlightResponce.start_index, 
         end_index: highlightResponce.end_index 
       })

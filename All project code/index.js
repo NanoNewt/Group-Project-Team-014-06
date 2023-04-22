@@ -322,8 +322,14 @@ app.get("/profile", (req, res) => {
   });
 });
 
-app.get('/annotations', (req, res) => {
-  res.render("pages/annotations");
+app.get('/annotations/:book_id/:page_number', async (req, res) => {
+  const book_id = req.params.book_id;
+  const page_number = req.params.page_number;
+
+  res.render("pages/annotations", {
+    book_id: book_id,
+    page_number: page_number,
+  });
 });
 
 app.post('/create_annotation', async (req,res) => {

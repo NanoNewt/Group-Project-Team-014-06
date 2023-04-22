@@ -29,6 +29,9 @@
         <form style="padding: 2px" method="GET" action="/changePage/<%=book.id%>/<%=currentPage+1%>">
           <button class="btn btn-primary" type="submit">Next Page</button>
         </form>
+        <form style="padding: 2px" method="GET" action="/annotations/<%=book.id%>/<%=currentPage+1%>">
+          <button class="btn btn-warning" type="submit">Annotate Page</button>
+        </form>
       </div>
       <div style="display: flex; justify-content: center;">
         <form style="padding: 2px" method="GET" id="skipToForm">
