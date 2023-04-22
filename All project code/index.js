@@ -67,7 +67,7 @@ let currentPage = 1;
 // Lab 11
 
 const user = {
-  student_id: undefined,
+  id: undefined,
   username: undefined,
 };
 
@@ -173,43 +173,47 @@ app.post('/login', async (req, res) => {
 app.get("/profile", (req, res) => {
   // Check if user is logged in
   if (!req.session.user) {
-    res.status(300).render("pages/login", {
-      error: true,
-      message: "Please login.",
-    });
+    res.redirect("/login");
+    return;
   }
 
-  // Retrieve user's favorite books and annotations from database
   const userId = req.session.user.id;
-  const query = `
+
+  // Retrieve user's favorite books from database
+  const booksQuery = `
     SELECT books.id, books.title, books.author, books.genre, books.description
     FROM books
     INNER JOIN user_to_books ON user_to_books.book_id = books.id
     WHERE user_to_books.user_id = $1
   `;
-  const values = [userId];
+  const booksValues = [userId];
 
-  db.query(query, values)
+  db.query(booksQuery, booksValues)
     .then(result => {
-      const favoriteBooks = result.rows;
+      const favoriteBooks = result.rows || [];
 
-      const query = `
-        SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, annotations.comment
+      // Retrieve user's annotations and comments from database
+      const annotationsQuery = `
+        SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, comments.comment
         FROM annotations
-        INNER JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+        LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+        LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
+        LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
         WHERE user_to_annotation.user_id = $1
       `;
-      const values = [userId];
+      const annotationsValues = [userId];
 
-      return db.query(query, values)
+      return db.query(annotationsQuery, annotationsValues)
         .then(result => {
-          const annotations = result.rows;
+          const annotations = result.rows || [];
 
           // Render the profile page with user's data
           res.render("pages/profile", {
             username: req.session.user.username,
             favoriteBooks: favoriteBooks,
             annotations: annotations,
+            noFavoriteBooks: favoriteBooks.length === 0,
+            noAnnotations: annotations.length === 0,
           });
         });
     })
@@ -218,6 +222,9 @@ app.get("/profile", (req, res) => {
       res.status(500).send("An error occurred while retrieving user data.");
     });
 });
+
+
+
 
 
 
