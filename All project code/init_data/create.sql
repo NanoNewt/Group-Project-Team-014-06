@@ -14,12 +14,6 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     password CHAR(60) NOT NULL,
-    first_name VARCHAR(50) NULL,
-    last_name VARCHAR(50) NULL,
-    email VARCHAR(255) NULL,
-    year INT NULL,
-    major VARCHAR(255) NULL,
-    degree VARCHAR(255) NULL
 );
 
 -- Create the books table
@@ -86,6 +80,6 @@ CREATE TABLE books_to_annotation (
 
 
 
-INSERT INTO users (username, password, first_name, last_name, email, year, major,degree) VALUES ('test','test','test','test','test','2023','math','junior');
-INSERT INTO users (username, password, first_name, last_name, email, year, major,degree) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6','test','test','test','2023','math','junior');
+INSERT INTO users (username, password) VALUES ('test','test');
+INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6');
 
