@@ -4,11 +4,14 @@
 
 <main>
   <div>
-    <form action="/books" method="GET">
-      <label for="search">Search:</label>
-      <input type="text" id="search" name="search">
-      <button type="submit">Submit</button>
-    </form>
+    <div stlye="width: 200px">
+      <form stlye="width: 200px" action="/books" method="GET">
+        <div stlye="width: 200px" class="input-group">
+          <input stlye="width: 200px"type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+          <button type="submit" class="btn btn-outline-primary">search</button>
+        </div>
+      </form>
+    </div>
     <% try { %>
         <% var i = 0 %>
         <% books.forEach(function(book) { %>
@@ -17,9 +20,11 @@
             <%} %>
             <% i++ %>
             <div class="col-sm d-flex justify-content-center">
-                <div class="card" style="width: 20rem;">
+                <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
+                    <a class="card-block stretched-link" href="/singlebook/<%= book.id %>"></a>
                     <div class="card-body">
-                        <h5 class="card-title"><%= book.title %></h5>
+                        <img src="/book_img" class="card-img" height="55%" style=""/>
+                        <h5 class="card-title" style="padding-top: 10px;"><%= book.title %></h5>
                         <h6 class="card-subtitle mb-2 text-muted"> <%=book.name%>
                             <%for(var j = 0; j < book.authors.length; j++){ %>
                                 <%= book.authors[j]%>
@@ -29,7 +34,6 @@
                     </div>
                 </div>
             </div>
-          <!-- <li><a href="/books/<%= book.id %>"><%= book.title %></a></li> -->
 
           <!-- Blank card bc Bootstrap doesn't support creating static grids -->
           <% if(i >= books.length && ((i % 3) != 0)){ %>

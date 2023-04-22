@@ -62,6 +62,7 @@ app.use(
 // <!-- Section 4 : API Routes -->
 // *****************************************************
 
+let currentPage = 1;
 
 // Lab 11
 
@@ -119,6 +120,10 @@ app.get('/bookmarks', (req, res) => {
   res.render("pages/profile");
 });
 
+
+app.get('/singlebook', (req, res) => {
+  res.render("pages/singlebook");
+});
 
 //login
 app.get('/login', (req, res) => {
@@ -257,7 +262,7 @@ app.get('/books', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch books' });
 }});
 
-app.get('/books/:id', async (req, res) => {
+app.get('/singlebook/:id', async (req, res) => {
   try {
     const bookId = req.params.id;
     const url = `http://www.gutenberg.org/files/${bookId}/${bookId}-0.txt`;
@@ -271,11 +276,22 @@ app.get('/books/:id', async (req, res) => {
       currentPage = parseInt(req.query.currentPage);
     }
 
-    res.render('pages/books', { book, currentPage });
+    res.render('pages/singlebook', { book, currentPage });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch book contents' });
   }
+});
+
+app.get('/changePage/:id/:pagenum', (req, res) => {
+  currentPage = parseInt(req.params.pagenum, 10);
+
+  if (currentPage < 1) {
+    currentPage = 1;
+  }
+  
+  const bookId = req.params.id;
+  res.redirect(`/singlebook/${bookId}`);
 });
 
 // Authentication Middleware.
