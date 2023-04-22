@@ -120,6 +120,10 @@ app.get('/bookmarks', (req, res) => {
 });
 
 
+app.get('/singlebook', (req, res) => {
+  res.render("pages/singlebook");
+});
+
 //login
 app.get('/login', (req, res) => {
   res.render("pages/login");
