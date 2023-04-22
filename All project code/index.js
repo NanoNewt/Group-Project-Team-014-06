@@ -69,12 +69,6 @@ let currentPage = 1;
 const user = {
   student_id: undefined,
   username: undefined,
-  first_name: undefined,
-  last_name: undefined,
-  email: undefined,
-  year: undefined,
-  major: undefined,
-  degree: undefined,
 };
 
 app.get('/welcome', (req, res) => {
@@ -212,14 +206,8 @@ app.get("/profile", (req, res) => {
           const annotations = result.rows;
 
           // Render the profile page with user's data
-          res.render("pages/home", {
+          res.render("pages/profile", {
             username: req.session.user.username,
-            first_name: req.session.user.first_name,
-            last_name: req.session.user.last_name,
-            email: req.session.user.email,
-            year: req.session.user.year,
-            major: req.session.user.major,
-            degree: req.session.user.degree,
             favoriteBooks: favoriteBooks,
             annotations: annotations,
           });
