@@ -206,7 +206,7 @@ app.get("/profile", (req, res) => {
           const annotations = result.rows;
 
           // Render the profile page with user's data
-          res.render("pages/home", {
+          res.render("pages/profile", {
             username: req.session.user.username,
             favoriteBooks: favoriteBooks,
             annotations: annotations,
