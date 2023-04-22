@@ -70,7 +70,16 @@ const books = {
 
 // Lab 11
 
-const user = {};
+const user = {
+  student_id: undefined,
+  username: undefined,
+  first_name: undefined,
+  last_name: undefined,
+  email: undefined,
+  year: undefined,
+  major: undefined,
+  degree: undefined,
+};
 
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
@@ -168,24 +177,62 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get("/profile", async (req, res) => {
-  try {
-    const userId = req.session.user.id;
-    
-    const user = await pool.query("SELECT * FROM users WHERE id = $1", [userId]);
-    const books = await pool.query("SELECT b.* FROM user_to_books ub INNER JOIN books b ON ub.book_id = b.id WHERE ub.user_id = $1", [userId]);
-    const annotations = await pool.query("SELECT a.*, b.title FROM user_to_annotation ua INNER JOIN annotations a ON ua.annotation_id = a.id INNER JOIN books b ON a.book_id = b.id WHERE ua.user_id = $1", [userId]);
-
-    res.render("pages/profile", {
-      user: user.rows[0],
-      books: books.rows,
-      annotations: annotations.rows,
+app.get("/profile", (req, res) => {
+  // Check if user is logged in
+  if (!req.session.user) {
+    res.status(300).render("pages/login", {
+      error: true,
+      message: "Please login.",
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Internal Server Error");
   }
+
+  // Retrieve user's favorite books and annotations from database
+  const userId = req.session.user.id;
+  const query = `
+    SELECT books.id, books.title, books.author, books.genre, books.description
+    FROM books
+    INNER JOIN user_to_books ON user_to_books.book_id = books.id
+    WHERE user_to_books.user_id = $1
+  `;
+  const values = [userId];
+
+  db.query(query, values)
+    .then(result => {
+      const favoriteBooks = result.rows;
+
+      const query = `
+        SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, annotations.comment
+        FROM annotations
+        INNER JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+        WHERE user_to_annotation.user_id = $1
+      `;
+      const values = [userId];
+
+      return db.query(query, values)
+        .then(result => {
+          const annotations = result.rows;
+
+          // Render the profile page with user's data
+          res.render("pages/home", {
+            username: req.session.user.username,
+            first_name: req.session.user.first_name,
+            last_name: req.session.user.last_name,
+            email: req.session.user.email,
+            year: req.session.user.year,
+            major: req.session.user.major,
+            degree: req.session.user.degree,
+            favoriteBooks: favoriteBooks,
+            annotations: annotations,
+          });
+        });
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).send("An error occurred while retrieving user data.");
+    });
 });
+
+
 
 
 
@@ -274,17 +321,6 @@ app.get('/logout', (req,res)=> {
   res.render("pages/login", {message: 'Logged out Successfully'});
 })
 
-app.get("/profile", (req, res) => {
-  res.render("pages/profile", {
-    username: req.session.user.username,
-    first_name: req.session.user.first_name,
-    last_name: req.session.user.last_name,
-    email: req.session.user.email,
-    year: req.session.user.year,
-    major: req.session.user.major,
-    degree: req.session.user.degree,
-  });
-});
 
 app.get('/annotations', (req, res) => {
   res.render("pages/annotations");

@@ -1,46 +1,45 @@
-<main>
-  <div class="container">
-    <h1><center>Welcome User: <%= user.username %></center></h1>
-    <table class="table">
-      <tbody>
-        <tr>
-          <td>FIRST NAME</td>
-          <td><%= user.first_name %></td>
-        </tr>
-        <tr>
-          <td>LAST NAME</td>
-          <td><%= user.last_name %></td>
-        </tr>
-        <tr>
-          <td>EMAIL</td>
-          <td><%= user.email %></td>
-        </tr>
-        <tr>
-          <td>YEAR</td>
-          <td><%= user.year %></td>
-        </tr>
-        <tr>
-          <td>MAJOR</td>
-          <td><%= user.major %></td>
-        </tr>
-        <tr>
-          <td>DEGREE</td>
-          <td><%= user.degree %></td>
-        </tr>
-      </tbody>
-    </table>
+<%- include ('../partials/head') %>
+<%- include ('../partials/menu') %>
+<h1>Welcome, <%= first_name %> <%= last_name %> (<%= username %>)!</h1>
 
-    <h2>Favorite Books</h2>
-    <ul>
-      <% books.forEach(function(book) { %>
-        <li><%= book.title %> by <%= book.author %></li>
-      <% }) %>
-    </ul>
+<h2>User Info</h2>
+<ul>
+  <li>Email: <%= email %></li>
+  <li>Year: <%= year %></li>
+  <li>Major: <%= major %></li>
+  <li>Degree: <%= degree %></li>
+</ul>
 
-    <h2>Annotations</h2>
-    <% annotations.forEach(function(annotation) { %>
-      <h4><%= annotation.title %> - Page <%= annotation.page_number %></h4>
-      <p><%= annotation.comment %></p>
+<h2>Favorite Books</h2>
+<% if (favoriteBooks.length === 0) { %>
+  <p>You haven't added any favorite books yet.</p>
+<% } else { %>
+  <ul>
+    <% favoriteBooks.forEach(book => { %>
+      <li>
+        <h3><%= book.title %> by <%= book.author %></h3>
+        <ul>
+          <li>Genre: <%= book.genre %></li>
+          <li>Description: <%= book.description %></li>
+        </ul>
+      </li>
     <% }) %>
-  </div>
-</main>
+  </ul>
+<% } %>
+
+<h2>Annotations</h2>
+<% if (annotations.length === 0) { %>
+  <p>You haven't added any annotations yet.</p>
+<% } else { %>
+  <ul>
+    <% annotations.forEach(annotation => { %>
+      <li>
+        <h3>Annotation <%= annotation.id %> (Book ID: <%= annotation.book_id %>, Page Number: <%= annotation.page_number %>)</h3>
+        <ul>
+          <li>Comment: <%= annotation.comment %></li>
+        </ul>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
+<%- include ('../partials/footer') %>
