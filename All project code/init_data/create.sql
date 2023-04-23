@@ -11,8 +11,7 @@ DROP TABLE IF EXISTS comments;
 
 -- Create the users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) PRIMARY KEY,
     password CHAR(60) NOT NULL
 );
 
@@ -46,7 +45,7 @@ CREATE TABLE annotations (
 -- Create the comments table
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id),
+    username INT REFERENCES users(username),
     annotation_id INT REFERENCES annotations(id),
     comment TEXT NOT NULL
 );
@@ -59,16 +58,16 @@ CREATE TABLE annotation_to_comments (
 
 -- Create the user_to_books table
 CREATE TABLE user_to_books (
-    user_id INT REFERENCES users(id),
+    username INT REFERENCES users(username),
     book_id INT REFERENCES books(id),
-    PRIMARY KEY(user_id, book_id)
+    PRIMARY KEY(username, book_id)
 );
 
 -- Create the user_to_annotation table
 CREATE TABLE user_to_annotation (
-    user_id INT REFERENCES users(id),
+    username INT REFERENCES users(username),
     annotation_id INT REFERENCES annotations(id),
-    PRIMARY KEY(user_id, annotation_id)
+    PRIMARY KEY(username, annotation_id)
 );
 
 -- Create the books_to_annotation table

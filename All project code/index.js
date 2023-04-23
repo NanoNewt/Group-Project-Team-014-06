@@ -177,16 +177,16 @@ app.get("/profile", (req, res) => {
     return;
   }
 
-  const userId = req.session.user.id;
+  const username = req.session.user.username;
 
   // Retrieve user's favorite books from database
   const booksQuery = `
     SELECT books.id, books.title, books.author, books.genre, books.description
     FROM books
     INNER JOIN user_to_books ON user_to_books.book_id = books.id
-    WHERE user_to_books.user_id = $1
+    WHERE user_to_books.username = $1
   `;
-  const booksValues = [userId];
+  const booksValues = [username];
 
   db.query(booksQuery, booksValues)
     .then(result => {
@@ -199,7 +199,7 @@ app.get("/profile", (req, res) => {
         LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
         LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
         LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
-        WHERE user_to_annotation.user_id = $1
+        WHERE user_to_annotation.username = $1
       `;
       const annotationsValues = [userId];
 
@@ -398,11 +398,11 @@ app.get('/get_annotation_comments', async (req,res) => {
 app.post('/add_comment', async (req,res) => {
   const annotation_id = req.body.annotation_id;
   const comment_text = req.body.comment_text;
-  const user_id = req.session.user.id;
+  const username = req.session.user.username;
 
   // Create query
-  const cols = '(user_id,annotation_id,comment)';
-  const vals = `(${user_id},${annotation_id},${comment_text})`;
+  const cols = '(username,annotation_id,comment)';
+  const vals = `(${username},${annotation_id},${comment_text})`;
   const query = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
 
   // Send query
