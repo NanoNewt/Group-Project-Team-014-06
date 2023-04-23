@@ -1,36 +1,51 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
-<h1>Welcome, <%= username %></h1>
-<h2>Favorite Books</h2>
-<% if (favoriteBooks.length === 0) { %>
-  <p>You haven't added any favorite books yet.</p>
-<% } else { %>
-  <ul>
-    <% favoriteBooks.forEach(book => { %>
-      <li>
-        <h3><%= book.title %> by <%= book.author %></h3>
-        <ul>
-          <li>Genre: <%= book.genre %></li>
-          <li>Description: <%= book.description %></li>
+<div class="row">
+  <h1>Welcome <%= username %>!</h1>
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Favorite Books</h5>
+        <% if (noFavoriteBooks) { %>
+        <p>You haven't added any favorite books yet.</p>
+        <% } else { %>
+        <ul class="list-group">
+          <% favoriteBooks.forEach(book => { %>
+          <li class="list-group-item">
+            <h6><%= book.title %></h6>
+            <p>By <%= book.author %></p>
+            <p><%= book.genre %></p>
+            <p><%= book.description %></p>
+          </li>
+          <% }); %>
         </ul>
-      </li>
-    <% }) %>
-  </ul>
-<% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
 
-<h2>Annotations</h2>
-<% if (annotations.length === 0) { %>
-  <p>You haven't added any annotations yet.</p>
-<% } else { %>
-  <ul>
-    <% annotations.forEach(annotation => { %>
-      <li>
-        <h3>Annotation <%= annotation.id %> (Book ID: <%= annotation.book_id %>, Page Number: <%= annotation.page_number %>)</h3>
-        <ul>
-          <li>Comment: <%= annotation.comment %></li>
+  <div class="col-md-6">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Annotations and Comments</h5>
+        <% if (noAnnotations) { %>
+        <p>You haven't added any annotations or comments yet.</p>
+        <% } else { %>
+        <ul class="list-group">
+          <% annotations.forEach(annotation => { %>
+          <li class="list-group-item">
+            <h6><%= annotation.book_id %></h6>
+            <p>Page <%= annotation.page_number %>, index <%= annotation.start_index %> to <%= annotation.end_index %></p>
+            <p><%= annotation.comment %></p>
+          </li>
+          <% }); %>
         </ul>
-      </li>
-    <% }) %>
-  </ul>
-<% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <%- include ('../partials/footer') %>

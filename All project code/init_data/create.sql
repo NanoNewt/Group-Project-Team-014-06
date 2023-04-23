@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS comments;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
-    password CHAR(60) NOT NULL,
+    password CHAR(60) NOT NULL
 );
 
 -- Create the books table
