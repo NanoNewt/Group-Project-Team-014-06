@@ -184,7 +184,8 @@ app.get("/profile", (req, res) => {
     SELECT books.id, books.title, books.author, books.genre, books.description
     FROM books
     INNER JOIN user_to_books ON user_to_books.book_id = books.id
-    WHERE user_to_books.username = $1
+    INNER JOIN users ON users.id = user_to_books.user_id
+    WHERE users.username = $1
   `;
   const booksValues = [username];
 
@@ -199,9 +200,10 @@ app.get("/profile", (req, res) => {
         LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
         LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
         LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
-        WHERE user_to_annotation.username = $1
+        INNER JOIN users ON users.id = user_to_annotation.user_id
+        WHERE users.username = $1
       `;
-      const annotationsValues = [userId];
+      const annotationsValues = [username];
 
       return db.query(annotationsQuery, annotationsValues)
         .then(result => {
@@ -209,7 +211,7 @@ app.get("/profile", (req, res) => {
 
           // Render the profile page with user's data
           res.render("pages/profile", {
-            username: req.session.user.username,
+            username: username,
             favoriteBooks: favoriteBooks,
             annotations: annotations,
             noFavoriteBooks: favoriteBooks.length === 0,
@@ -222,6 +224,7 @@ app.get("/profile", (req, res) => {
       res.status(500).send("An error occurred while retrieving user data.");
     });
 });
+
 
 
 
