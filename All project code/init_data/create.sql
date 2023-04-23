@@ -45,7 +45,7 @@ CREATE TABLE annotations (
 -- Create the comments table
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
-    username INT REFERENCES users(username),
+    username VARCHAR(50) REFERENCES users(username),
     annotation_id INT REFERENCES annotations(id),
     comment TEXT NOT NULL
 );
@@ -58,14 +58,14 @@ CREATE TABLE annotation_to_comments (
 
 -- Create the user_to_books table
 CREATE TABLE user_to_books (
-    username INT REFERENCES users(username),
+    username VARCHAR(50) REFERENCES users(username),
     book_id INT REFERENCES books(id),
     PRIMARY KEY(username, book_id)
 );
 
 -- Create the user_to_annotation table
 CREATE TABLE user_to_annotation (
-    username INT REFERENCES users(username),
+    username VARCHAR(50) REFERENCES users(username),
     annotation_id INT REFERENCES annotations(id),
     PRIMARY KEY(username, annotation_id)
 );
