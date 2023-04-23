@@ -4,13 +4,14 @@
 
 <main>
   <div>
-    <div stlye="width: 200px">
-      <form stlye="width: 200px" action="/books" method="GET">
-        <div stlye="width: 200px" class="input-group">
-          <input stlye="width: 200px"type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
-          <button type="submit" class="btn btn-outline-primary">search</button>
-        </div>
+    <div class="filter">
+
+      <form action="/books" method="GET">
+        <input type="text" placeholder="Search" id="search" name="search"> </input>
+        <button type="submit" id="s-icon" class="bi bi-search"></button>
       </form>
+        
+
     </div>
     <% try { %>
         <% var i = 0 %>
@@ -21,16 +22,18 @@
             <% i++ %>
             <div class="col-sm d-flex justify-content-center">
                 <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
+                    <button type="submit" id="b-icon" class="bi bi-bookmark-fill grey" style="font-size: 225%;" onclick="this.classList.toggle('bi bi-bookmark');"></button>
                     <a class="card-block stretched-link" href="/singlebook/<%= book.id %>"></a>
-                    <div class="card-body">
-                        <img src="/book_img" class="card-img" height="55%" style=""/>
-                        <h5 class="card-title" style="padding-top: 10px;"><%= book.title %></h5>
-                        <h6 class="card-subtitle mb-2 text-muted"> <%=book.name%>
+                    <div class="card-body" >
+                        <img src="/book_img" class="card-img" height="55%"/>
+                        <h5 class="card-title" style="padding-top: 5px;"><%= book.title %></h5>
+                        <h6 class="card-subtitle mb-2 text-muted"> <b>Author(s):</b>
                             <%for(var j = 0; j < book.authors.length; j++){ %>
                                 <%= book.authors[j]%>
                             <%} %>
                         </h6>
-                        <h7 class="card-subtitle mb-2 text-muted"><%= book.subjects[0]%></h7>
+                        <h7 class="card-subtitle mb-2 text-muted"><b>Genre:</b> <%= book.subjects[0]%></h7><br>
+                        <h7 class="card-subtitle mb-2 text-muted"><b>Language:</b> <%= book.languages[0]%></h7>
                     </div>
                 </div>
             </div>
@@ -52,17 +55,68 @@
       <p>No books found</p>
     <% } %>
   </div>
+
 </main>
+
+<script>
+    // var bookmark = document.querySelector(".card");
+    // bookmark.addEventListener('click',function(){
+    //     bookmark.classList.toggle('bi-bookmark black');   
+    // })
+
+</script>
 
 <style>
     #blank{
         border: none;
     }
 
+    #search {
+	    border-top: none;
+	    border-left: none;
+	    border-right: none;
+	    width: 200px;
+	    height: 30px;
+    }
+
+    #s-icon {
+        background-color: transparent;
+        border: none;
+    }
+
+    #b-icon{
+        background-color: transparent;
+        border: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        position: absolute;
+        left: 21.3vw;
+        top: -2.5vh;
+    }
+
+    #b-icon:hover{
+        scale: 1.1;
+    }
+
+    .filter{
+        padding-top: 1%;
+        padding-bottom: 1%;
+        text-align: center;
+    }
+
     .card{
         margin-top: 5px;
         margin-bottom: 5px;
     }
+
+    .grey {
+        color: #808080;
+    }
+
+    .black{
+        color: black;
+    }
+
 </style>
 
 <%- include ('../partials/footer') %>

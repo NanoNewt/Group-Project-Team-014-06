@@ -177,16 +177,16 @@ app.get("/profile", (req, res) => {
     return;
   }
 
-  const userId = req.session.user.id;
+  const username = req.session.user.username;
 
   // Retrieve user's favorite books from database
   const booksQuery = `
     SELECT books.id, books.title, books.author, books.genre, books.description
     FROM books
     INNER JOIN user_to_books ON user_to_books.book_id = books.id
-    WHERE user_to_books.user_id = $1
+    WHERE user_to_books.username = $1
   `;
-  const booksValues = [userId];
+  const booksValues = [username];
 
   db.query(booksQuery, booksValues)
     .then(result => {
@@ -199,7 +199,7 @@ app.get("/profile", (req, res) => {
         LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
         LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
         LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
-        WHERE user_to_annotation.user_id = $1
+        WHERE user_to_annotation.username = $1
       `;
       const annotationsValues = [userId];
 
@@ -353,9 +353,84 @@ app.get('/logout', (req,res)=> {
 })
 
 
-app.get('/annotations', (req, res) => {
-  res.render("pages/annotations");
+app.get('/annotations/:book_id/:page_number', async (req, res) => {
+  const book_id = req.params.book_id;
+  const page_number = req.params.page_number;
+
+  res.render("pages/annotations", {
+    book_id: book_id,
+    page_number: page_number,
+  });
 });
+
+app.post('/create_annotation', async (req,res) => {
+  console.log(req.body);
+  const book_id = req.body.book_id;
+  const page_number = req.body.page_number;
+  const start_index = req.body.start_index;
+  const end_index = req.body.end_index;
+
+  // Create insert sql
+  const cols = '(book_id,page_number,start_index,end_index)';
+  const vals = `(${book_id},${page_number},${start_index},${end_index})`;
+  const insert_sql = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
+
+  try {
+    const responce = await db.one(insert_sql);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get('/get_annotation_comments', async (req,res) => {
+  const annotation_id = req.params.id;
+
+  const query = `SELECT * FROM comments WHERE annotation_id = ${annotation_id};`;
+
+  try {
+    const responce = await db.any(query);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+app.post('/add_comment', async (req,res) => {
+  const annotation_id = req.body.annotation_id;
+  const comment_text = req.body.comment_text;
+  const username = req.session.user.username;
+
+  // Create query
+  const cols = '(username,annotation_id,comment)';
+  const vals = `(${username},${annotation_id},${comment_text})`;
+  const query = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
+
+  // Send query
+  try {
+    const responce = await db.one(query);
+    console.log(responce);
+    res.json(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+/*
+app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
+  const book_id = req.body.book_id;
+  const page_number = req.body.page_number;
+  
+
+  const query = `SELECT * FROM book_pages WHERE (book_id = ${book_id}) AND (page_number = ${page_number});`;
+
+  try {
+    const responce = await db.one(query);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+*/
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
