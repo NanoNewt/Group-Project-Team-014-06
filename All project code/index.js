@@ -384,6 +384,7 @@ app.post('/add_comment', async (req,res) => {
   }
 });
 
+/*
 app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
   const book_id = req.body.book_id;
   const page_number = req.body.page_number;
@@ -398,7 +399,7 @@ app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
     console.log(error);
   }
 });
-
+*/
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
