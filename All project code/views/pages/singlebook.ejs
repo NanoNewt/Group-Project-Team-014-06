@@ -11,7 +11,12 @@
 
       %>
       
-      <main> 
+      <main>
+        <!-- The following 2 divs are an attempt to pass ejs variables into 
+          javascript without my syntax error detection getting a false positive -->
+        <div hidden id="current_page"><%=currentPage%></div>
+        <div hidden id="book_id"><%=book.id%></div>
+
   <div class="col-container">
     <div class="col-9">
       <div class="container" id="annotation_pages">
@@ -78,33 +83,18 @@ let cur_annotation;
 let page;
 let chars_in_page;
 let page_contents;
-const PAGE_NUMBER = 1;
-const BOOK_ID = 1;
+let PAGE_NUMBER; 
+let BOOK_ID;
 
 console.log(BOOK_ID);
 console.log(PAGE_NUMBER);
 document.querySelector("main").onload = onload_test();
 
 function onload_test(){
-  // get book contents
-  fetch('/bookPage_from_bookID_and_pageNumber', {
-    method: "POST",
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      book_id: BOOK_ID,
-      page_number: PAGE_NUMBER, 
-    })
-  })
-  .then(responce => {
-    console.log(responce);
-    responce.json().then( (result) =>{
-      page_contents = results.page_content;
-      getElementById('book_display').innerHTML = page_contents;
-    });
-  });
+  PAGE_NUMBER = Number(document.getElementById('current_page').innerHTML);
+  BOOK_ID = Number(document.getElementById('book_id').innerHTML);
+  console.log(BOOK_ID);
+  console.log(PAGE_NUMBER);
 }
 
 function set_cur_annotation(id){
