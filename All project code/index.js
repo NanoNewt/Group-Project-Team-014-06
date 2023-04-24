@@ -125,9 +125,7 @@ app.get('/bookmarks', (req, res) => {
 });
 
 
-app.get('/singlebook', (req, res) => {
-  res.render("pages/singlebook");
-});
+
 
 //login
 app.get('/login', (req, res) => {
@@ -324,6 +322,21 @@ app.get('/books', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch books' });
 }});
 
+
+
+
+
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
+};
+// Authentication Required
+app.use(auth);
+
 app.get('/singlebook/:id', async (req, res) => {
   try {
     const bookId = req.params.id;
@@ -356,16 +369,9 @@ app.get('/changePage/:id/:pagenum', (req, res) => {
   res.redirect(`/singlebook/${bookId}`);
 });
 
-// Authentication Middleware.
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect('/login');
-  }
-  next();
-};
-// Authentication Required
-app.use(auth);
+app.get('/singlebook', (req, res) => {
+  res.render("pages/singlebook");
+});
 
 app.get('/logout', (req,res)=> {
   req.session.destroy();
