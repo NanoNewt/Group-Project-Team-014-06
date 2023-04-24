@@ -251,12 +251,13 @@ app.post('/register', async (req,res) => {
 
   try {
     await db.any(insert_sql);
-    res.redirect(200, '/login');
+    res.status(200).redirect("/login");
+    // res.redirect("/login");
   } 
   catch (error){
     res.status(300).render("pages/register", {
       error: true,
-      message: "Insertion Error",
+      message: "Username Exists Please Login",
     })
   }
 });
