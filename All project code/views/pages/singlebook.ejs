@@ -21,9 +21,9 @@
     <div class="col-9">
       <div class="container" id="annotation_pages">
         <h1>Book </h1>
-        <pre id="book_display">
+        <p id="book_display">
           <%= page1+page2 %>
-        </pre>
+        </p>
           
           <div style="display: flex; justify-content: center;">
           <b>Page <%=currentPage%>/<%=currentPage + 1%></b>
@@ -185,6 +185,38 @@ function create_annotation(){
       refresh_comments()
     });
   });
+}
+
+function highlight_annotations(){
+  ranges_to_highlight = [];
+  annotations.forEach((ann) =>{
+    ranges_to_highlight.push([ann.start_index,ann.end_index]);
+  });
+  highlightRanges(ranges_to_highlight);
+}
+
+function highlightRanges(ranges_to_highlight){
+  //expects the ranges to not overlap
+
+  //ranges_to_highlight.sortbylargestend
+
+  const book_display = document.getElementById('book_display');
+  console.log('start array');
+  console.log(ranges_to_highlight);
+  let text = book_display.textContent;
+  ranges_to_highlight.sort((a,b) => {return b[1]-a[1]});
+  console.log('sorted array');
+  console.log(ranges_to_highlight);
+
+  ranges_to_highlight.forEach((range)=>{
+    highlight_start = range[0];
+    highlight_end = range[1];
+    prev_version_begining = text.slice(0,highlight_start);
+    prev_version_end = text.slice(highlight_end);
+    text_to_highlight = text.slice(highlight_start,highlight_end);
+    text = prev_version_begining +'<mark>'+text_to_highlight+'</mark>'+prev_version_end;
+  });
+  book_display.innerHTML =text;
 }
 
 function highlightSelectedText() {
