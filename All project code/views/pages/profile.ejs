@@ -1,12 +1,13 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
+
 <div class="row">
   <h1>Welcome <%= username %>!</h1>
   <div class="col-md-6">
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Favorite Books</h5>
-        <% if (noFavoriteBooks) { %>
+        <% if (favoriteBooks.length === 0) { %>
         <p>You haven't added any favorite books yet.</p>
         <% } else { %>
         <ul class="list-group">
@@ -23,18 +24,17 @@
       </div>
     </div>
   </div>
-
   <div class="col-md-6">
     <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Annotations and Comments</h5>
-        <% if (noAnnotations) { %>
+        <% if (annotations.length === 0) { %>
         <p>You haven't added any annotations or comments yet.</p>
         <% } else { %>
         <ul class="list-group">
           <% annotations.forEach(annotation => { %>
           <li class="list-group-item">
-            <h6><%= annotation.book_id %></h6>
+            <h6><%= annotation.book.title %></h6>
             <p>Page <%= annotation.page_number %>, index <%= annotation.start_index %> to <%= annotation.end_index %></p>
             <p><%= annotation.comment %></p>
           </li>
@@ -45,7 +45,7 @@
     </div>
   </div>
 </div>
-
-
-
 <%- include ('../partials/footer') %>
+<script>
+  
+</script>
