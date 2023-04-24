@@ -110,6 +110,32 @@ app.get('/class_notes', (req, res) => {
   res.render("pages/class_notes");
 });
 
+app.post('/add_favorite', async (req, res) => {
+  const { title, author, genre, description } = req.body;
+   const username = req.session.user.username;
+  try {
+    // Check if the book already exists in the books table
+    let book = await db.oneOrNone('SELECT id FROM books WHERE title=$1', title);
+    // If book doesn't exist, add it to the books table
+    if (!book) {
+      book = await db.one(
+        'INSERT INTO books (title, author, genre, description) VALUES ($1, $2, $3, $4) RETURNING *',
+        [title, author, genre, description],
+      );
+    }
+    // Add book and user relationship to user_to_books table
+    await db.none(
+      'INSERT INTO user_to_books (username, book_id) VALUES ($1, $2)',
+      [username, book.id]
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+
 
 app.get('/', (req, res) => {
   res.render("pages/splash",
@@ -171,59 +197,60 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get("/profile", (req, res) => {
-  // Check if user is logged in
-  if (!req.session.user) {
-    res.redirect("/login");
-    return;
-  }
+app.get("/profile", async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session.user) {
+      res.redirect("/login");
+      return;
+    }
 
-  const username = req.session.user.username;
+    const username = req.session.user.username;
 
-  // Retrieve user's favorite books from database
-  const booksQuery = `
-    SELECT books.id, books.title, books.author, books.genre, books.description
-    FROM books
-    INNER JOIN user_to_books ON user_to_books.book_id = books.id
-    INNER JOIN users ON users.id = user_to_books.user_id
-    WHERE users.username = $1
-  `;
-  const booksValues = [username];
+    // Retrieve user's favorite books from database
+    const booksQuery = `
+      SELECT books.id, books.title, books.author, books.genre, books.description
+      FROM books
+      INNER JOIN user_to_books ON user_to_books.book_id = books.id
+      INNER JOIN users ON users.username = user_to_books.username
+      WHERE users.username = $1
+    `;
+    const booksValues = [username];
+    const booksResult = await db.query(booksQuery, booksValues);
+    const favoriteBooks = booksResult || [];
+    console.log('favoriteBooks query:', booksQuery);
+    console.log('favoriteBooks values:', booksValues);
+    console.log('favoriteBooks result:', booksResult);
+    console.log('favoriteBooks:', favoriteBooks);
 
-  db.query(booksQuery, booksValues)
-    .then(result => {
-      const favoriteBooks = result.rows || [];
 
-      // Retrieve user's annotations and comments from database
-      const annotationsQuery = `
-        SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, comments.comment
-        FROM annotations
-        LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
-        LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
-        LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
-        INNER JOIN users ON users.id = user_to_annotation.user_id
-        WHERE users.username = $1
-      `;
-      const annotationsValues = [username];
 
-      return db.query(annotationsQuery, annotationsValues)
-        .then(result => {
-          const annotations = result.rows || [];
+    // Retrieve user's annotations and comments from database
+    const annotationsQuery = `
+      SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, comments.comment
+      FROM annotations
+      LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+      LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
+      LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
+      INNER JOIN users ON users.username = user_to_annotation.username
+      WHERE users.username = $1
+    `;
+    const annotationsValues = [username];
+    const annotationsResult = await db.query(annotationsQuery, annotationsValues);
+    const annotations = annotationsResult || [];
 
-          // Render the profile page with user's data
-          res.render("pages/profile", {
-            username: username,
-            favoriteBooks: favoriteBooks,
-            annotations: annotations,
-            noFavoriteBooks: favoriteBooks.length === 0,
-            noAnnotations: annotations.length === 0,
-          });
-        });
-    })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send("An error occurred while retrieving user data.");
+    // Render the profile page with user's data
+    res.render("pages/profile", {
+      username: username,
+      favoriteBooks: favoriteBooks,
+      annotations: annotations,
+      noFavoriteBooks: favoriteBooks.length === 0,
+      noAnnotations: annotations.length === 0,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while retrieving user data.");
+  }
 });
 
 
