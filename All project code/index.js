@@ -95,6 +95,7 @@ app.get('/backsplash', (req, res) => {
 });
 
 app.get('/literature', (req, res) => {
+  
   res.render("pages/literature");
 });
 
@@ -277,6 +278,21 @@ app.get('/book_img', (req, res) => {
 
 app.get('/classnotes_img', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'class_notes.jpg');
+  res.sendFile(imagePath);
+});
+
+app.get('/ebook_img', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'ebook.jpg');
+  res.sendFile(imagePath);
+});
+
+app.get('/annotations_img', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'annotations.jpg');
+  res.sendFile(imagePath);
+});
+
+app.get('/notes_img', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'notes.png');
   res.sendFile(imagePath);
 });
 
