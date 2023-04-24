@@ -81,7 +81,7 @@
 let annotations = [];
 let cur_annotation;
 let page;
-let chars_in_page;
+let page_length;
 let page_contents;
 let PAGE_NUMBER; 
 let BOOK_ID;
@@ -93,8 +93,10 @@ document.querySelector("main").onload = onload_test();
 function onload_test(){
   PAGE_NUMBER = Number(document.getElementById('current_page').innerHTML);
   BOOK_ID = Number(document.getElementById('book_id').innerHTML);
+  page_length = document.getElementById('book_display').innerHTML.length;
   console.log(BOOK_ID);
   console.log(PAGE_NUMBER);
+  console.log(page_length);
 }
 
 function set_cur_annotation(id){

@@ -81,4 +81,3 @@ CREATE TABLE books_to_annotation (
 
 INSERT INTO users (username, password) VALUES ('test','test');
 INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6');
-
