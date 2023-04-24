@@ -155,7 +155,7 @@ function refresh_comments(){
 
 function create_annotation(){
   console.log("creating annotations");
-  const highlightResponce = highlightText();
+  const highlightResponce = highlightSelectedText();
   var new_annotation;
   fetch('/create_annotation', {
     method: "POST",
@@ -188,7 +188,7 @@ function create_annotation(){
   });
 }
 
-function highlightText() {
+function highlightSelectedText() {
   var selection = window.getSelection();
   if (selection.rangeCount) {
     var range = selection.getRangeAt(0).cloneRange();
