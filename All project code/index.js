@@ -110,6 +110,42 @@ app.get('/class_notes', (req, res) => {
   res.render("pages/class_notes");
 });
 
+app.post('/add_favorite', async (req, res) => {
+  // Check if user is logged in
+  if (!req.session.user) {
+    res.redirect("/login");
+    return;
+  }
+  const { title, author, genre, description } = req.body;
+   const username = req.session.user.username;
+  try {
+    // Check if the book already exists in the books table
+    let book = await db.oneOrNone('SELECT id FROM books WHERE title=$1', title);
+    // If book doesn't exist, add it to the books table
+    if (!book) {
+      book = await db.one(
+        'INSERT INTO books (title, author, genre, description) VALUES ($1, $2, $3, $4) RETURNING *',
+        [title, author, genre, description],
+      );
+    }
+    // Add book and user relationship to user_to_books table
+    await db.none(
+      'INSERT INTO user_to_books (username, book_id) VALUES ($1, $2)',
+      [username, book.id]
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: 'error',
+    });
+ 
+  }
+});
+
+
+
+
 
 app.get('/', (req, res) => {
   res.render("pages/splash",
@@ -169,62 +205,105 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get("/profile", (req, res) => {
-  // Check if user is logged in
-  if (!req.session.user) {
-    res.redirect("/login");
-    return;
+app.get("/profile", async (req, res) => {
+  try {
+    // Check if user is logged in
+    if (!req.session.user) {
+      res.redirect("/login");
+      return;
+    }
+
+    const username = req.session.user.username;
+
+    // Retrieve user's favorite books from database
+    const booksQuery = `
+      SELECT books.id, books.title, books.author, books.genre, books.description
+      FROM books
+      INNER JOIN user_to_books ON user_to_books.book_id = books.id
+      INNER JOIN users ON users.username = user_to_books.username
+      WHERE users.username = $1
+    `;
+    const booksValues = [username];
+    const booksResult = await db.query(booksQuery, booksValues);
+    const favoriteBooks = booksResult || [];
+
+
+
+    // Retrieve user's annotations and comments from database
+    const annotationsQuery = `
+      SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, comments.comment
+      FROM annotations
+      LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+      LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
+      LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
+      INNER JOIN users ON users.username = user_to_annotation.username
+      WHERE users.username = $1
+    `;
+    const annotationsValues = [username];
+    const annotationsResult = await db.query(annotationsQuery, annotationsValues);
+    const annotations = annotationsResult || [];
+
+    // Render the profile page with user's data
+    res.render("pages/profile", {
+      username: username,
+      favoriteBooks: favoriteBooks,
+      annotations: annotations,
+      noFavoriteBooks: favoriteBooks.length === 0,
+      noAnnotations: annotations.length === 0,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while retrieving user data.");
   }
+});
 
+// DELETE user data (books and annotations)
+// <!-- Endpoint 5 :  Delete User ("/delete_user") -->
+app.delete('/api/books/:bookID', function (req, res) {
+  const bookID = req.params.bookID;
   const username = req.session.user.username;
+  const query = 'DELETE FROM user_to_books WHERE book_id = $1 AND username = $2; DELETE FROM user_to_books WHERE book_id = $1 AND username = $2;';
 
-  // Retrieve user's favorite books from database
-  const booksQuery = `
-    SELECT books.id, books.title, books.author, books.genre, books.description
-    FROM books
-    INNER JOIN user_to_books ON user_to_books.book_id = books.id
-    INNER JOIN users ON users.id = user_to_books.user_id
-    WHERE users.username = $1
-  `;
-  const booksValues = [username];
-
-  db.query(booksQuery, booksValues)
-    .then(result => {
-      const favoriteBooks = result.rows || [];
-
-      // Retrieve user's annotations and comments from database
-      const annotationsQuery = `
-        SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, comments.comment
-        FROM annotations
-        LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
-        LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
-        LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
-        INNER JOIN users ON users.id = user_to_annotation.user_id
-        WHERE users.username = $1
-      `;
-      const annotationsValues = [username];
-
-      return db.query(annotationsQuery, annotationsValues)
-        .then(result => {
-          const annotations = result.rows || [];
-
-          // Render the profile page with user's data
-          res.render("pages/profile", {
-            username: username,
-            favoriteBooks: favoriteBooks,
-            annotations: annotations,
-            noFavoriteBooks: favoriteBooks.length === 0,
-            noAnnotations: annotations.length === 0,
-          });
-        });
+  db.query(query, [bookID, username])
+    .then(function () {
+      res.status(200).json({
+        status: 'success',
+        message: `Book with ID ${bookID} and username ${username} deleted successfully.`,
+      });
     })
-    .catch(error => {
-      console.error(error);
-      res.status(500).send("An error occurred while retrieving user data.");
+    .catch(function (err) {
+      console.log(err);
+      res.status(500).json({
+        status: 'error',
+        message: 'Error occurred while deleting book.',
+      });
     });
 });
 
 
+
+// Delete an annotation
+app.delete('/api/annotations/:annotationID', function (req, res) {
+  //Here we are using path parameter
+  const username = req.params.username;
+  const query = 'delete from user_to_annotations where username = $1 returning * ;';
+
+  db.any(query, [username])
+    // if query execution succeeds
+    // send success message
+    .then(function (data) {
+      res.status(200).json({
+        status: 'success',
+        data: data,
+        message: 'data deleted successfully',
+      });
+    })
+    // if query execution fails
+    // send error message
+    .catch(function (err) {
+      return console.log(err);
+    });
+});
 
 
 
@@ -249,12 +328,13 @@ app.post('/register', async (req,res) => {
 
   try {
     await db.any(insert_sql);
-    res.redirect(200, '/login');
+    res.status(200).redirect("/login");
+    // res.redirect("/login");
   } 
   catch (error){
     res.status(300).render("pages/register", {
       error: true,
-      message: "Insertion Error",
+      message: "Username Exists Please Login",
     })
   }
 });
@@ -440,6 +520,23 @@ app.post('/add_comment', async (req,res) => {
   }
 });
 
+app.post('/annotations_for_page', async (req,res) => {
+  const book_id = req.body.book_id;
+  const page_number = req.body.page_number;
+
+  const condition = `(book_id = ${book_id}) AND (page_number = ${page_number})`
+  const query = `SELECT * FROM annotations WHERE ${condition};`;
+
+  try {
+    const responce = await db.any(query);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
 /*
 app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
   const book_id = req.body.book_id;
@@ -456,6 +553,39 @@ app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
   }
 });
 */
+
+
+// class notes below
+
+app.post('/notes', (req, res) => {
+  const { course_id, title, content } = req.body;
+  const query = 'INSERT INTO cnotes (course_id, title, content) VALUES ($1, $2, $3) RETURNING course_id, title, content';
+  const values = [course_id, title, content];
+  db.one(query, values)
+    .then(result => {
+      console.log('New note inserted into the database with course ID:', result.course_id);
+      res.status(201).json(result);
+    })
+    .catch(error => {
+      console.error('Error inserting new note into the database:', error);
+      res.status(500).send('Error inserting new note into the database');
+    });
+});
+
+app.get('/notes/:course_id', (req, res) => {
+  const course_id = req.params.course_id;
+  const query = 'SELECT * FROM cnotes WHERE course_id = $1';
+  const values = [course_id];
+
+  db.any(query, values)
+    .then(notes => {
+      res.status(200).json(notes);
+    })
+    .catch(error => {
+      console.error('Error fetching notes from the database:', error);
+      res.status(500).send('Error fetching notes from the database');
+    });
+});
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->

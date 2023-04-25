@@ -1,5 +1,6 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
+<%- include ('../partials/message') %>
 
 
 <main>
@@ -22,7 +23,7 @@
             <% i++ %>
             <div class="col-sm d-flex justify-content-center">
                 <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
-                    <button type="submit" id="b-icon" class="bi bi-bookmark-fill grey" style="font-size: 225%;" onclick="this.classList.toggle('bi bi-bookmark');"></button>
+                    <button type="submit"id="b-icon"class="bi bi-bookmark-fill grey"style="font-size: 225%;"onclick="addFavorite('<%= book.title %>')"></button>
                     <a class="card-block stretched-link" href="/singlebook/<%= book.id %>"></a>
                     <div class="card-body" >
                         <img src="/book_img" class="card-img" height="55%"/>
@@ -63,6 +64,31 @@
     // bookmark.addEventListener('click',function(){
     //     bookmark.classList.toggle('bi-bookmark black');   
     // })
+  function addFavorite(title) {
+    fetch('/add_favorite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title }),
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          // Update bookmark icon
+          message:"You have added this book"
+          const icon = document.querySelector(`button[onclick="addFavorite('${title}')"`);
+          icon.classList.toggle('bi-bookmark');
+          icon.classList.toggle('black');
+        }
+        if (res.status === 500) {
+          alert('You have added this book');
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
 
 </script>
 

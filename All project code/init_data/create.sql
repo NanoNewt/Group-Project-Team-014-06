@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS annotations;
 DROP TABLE IF EXISTS book_pages;
 DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS cnotes;
 
 
 -- Create the users table
@@ -19,9 +20,9 @@ CREATE TABLE users (
 CREATE TABLE books (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    author VARCHAR(255) NOT NULL,
-    genre VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL
+    author VARCHAR(255),
+    genre VARCHAR(255),
+    description TEXT
 );
 
 
@@ -77,6 +78,12 @@ CREATE TABLE books_to_annotation (
     PRIMARY KEY(book_id, annotation_id)
 );
 
+-- Create the cnotes table
+CREATE TABLE cnotes (
+    course_id SERIAL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL
+);
 
 
 INSERT INTO users (username, password) VALUES ('test','test');
