@@ -507,8 +507,8 @@ app.post('/add_comment', async (req,res) => {
 
   // Create query
   const cols = '(username,annotation_id,comment)';
-  const vals = `(${username},${annotation_id},${comment_text})`;
-  const query = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
+  const vals = `('${username}',${annotation_id},'${comment_text}')`;
+  const query = `INSERT INTO comments ${cols} VALUES ${vals} RETURNING *;`;
 
   // Send query
   try {
@@ -535,7 +535,48 @@ app.post('/annotations_for_page', async (req,res) => {
   }
 });
 
+app.post('/get_comments_for_annotations', async (req,res) => {
+  const annotations = req.body.annotations;
 
+  let list ='';
+  annotations.forEach(ann => {
+    list += ann.id + ',';
+  });
+  if(annotations.length > 0){// remove comma at end
+    list = list.substring(0,list.length-1);
+  }
+
+  const query = `SELECT * FROM comments WHERE annotation_id IN (${list});`;
+
+  try {
+    const responce = await db.any(query);
+    console.log(responce);
+    // make list of unique annotation_ids among comments
+    let annotation_ids = [];
+    responce.forEach(comment =>{
+      if(annotation_ids.find(ann_id => {return ann_id == comment.annotation_id }) == null){
+        annotation_ids.push(comment.annotation_id);
+      }
+    });
+
+    // create array called annotations and populate it with annotations
+    let annotations = [];
+    annotation_ids.forEach((annotation_id) =>{
+      annotations.push({id: annotation_id, comments: []})
+    });
+
+    // put comments in annotations
+    responce.forEach(comment => {
+      comments_annotation = annotations.find(ann => {return ann.id == comment.annotation_id });
+      comments_annotation.comments.push(comment);
+    });
+
+
+    res.send(annotations);
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 /*
 app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
