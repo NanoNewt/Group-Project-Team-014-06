@@ -80,6 +80,7 @@
 <script>
 let annotations = [];
 let cur_annotation;
+
 let book_contents;
 let page_length;
 let PAGE_NUMBER; 
@@ -112,6 +113,10 @@ function removeAllChildren(node){
 
 function add_comment(text){
   // FIX ME: Push comment to database
+  //
+  //fetch('/add_comment', {
+
+  //})
   cur_annotation.comments.push(text);
   refresh_comments();
 }
@@ -134,11 +139,9 @@ function refresh_comments(){
   removeAllChildren(comments_section);
 
   //refresh annotation_box
-  if(cur_annotation.text_elm.innerHTML == null){
-    annotation_box.innerHTML = "none";
-    return;
-  }
-  annotation_box.innerHTML = cur_annotation.text_elm.innerHTML;
+  
+  annotation_box.innerHTML 
+    = book_contents.slice(cur_annotation.start_index, cur_annotation.end_index);
 
   //display this annotated text's comments
     // FIX ME: query database for what comments this annotation has
@@ -155,7 +158,7 @@ function refresh_comments(){
 
 function create_annotation(){
   console.log("creating annotations");
-  const highlightResponce = highlightSelectedText();
+  const selected_text = window.getSelection().toString();
   var new_annotation;
   fetch('/create_annotation', {
     method: "POST",
@@ -166,55 +169,45 @@ function create_annotation(){
     body: JSON.stringify({
       book_id: BOOK_ID,
       page_number: PAGE_NUMBER,
-      start_index: highlightResponce.start_index, 
-      end_index: highlightResponce.end_index 
+      start_index: book_contents.search(selected_text), 
+      end_index: book_contents.search(selected_text)+selected_text.length
     })
   })
   .then(responce => {
     responce.json().then( (result) =>{
       new_annotation = {
         id:result.id,
-        text_elm: highlightResponce.text_elm,
         comments: [],
         start_index: result.start_index, 
         end_index: result.end_index 
       };
       annotations.push(new_annotation);
-      new_annotation.text_elm.setAttribute('onclick', `set_cur_annotation(${new_annotation.id})`);
       cur_annotation = new_annotation;
-      refresh_comments()
+      highlight_annotations();
+      refresh_comments();
     });
   });
 }
 
-function highlight_annotations(){
-  ranges_to_highlight = [];
-  annotations.forEach((ann) =>{
-    ranges_to_highlight.push([ann.start_index,ann.end_index]);
-  });
-  highlightRanges(ranges_to_highlight);
-}
 
-function highlightRanges(ranges_to_highlight){
+function highlight_annotations(ranges_to_highlight){
   //expects the ranges to not overlap
 
-  //ranges_to_highlight.sortbylargestend
-
   const book_display = document.getElementById('book_display');
-  console.log('start array');
-  console.log(ranges_to_highlight);
   let text = book_display.textContent;
-  ranges_to_highlight.sort((a,b) => {return b[1]-a[1]});
-  console.log('sorted array');
-  console.log(ranges_to_highlight);
+  annotations.sort((a,b) => {return b.end_index-a.end_index});
 
-  ranges_to_highlight.forEach((range)=>{
-    highlight_start = range[0];
-    highlight_end = range[1];
+  annotations.forEach((ann)=>{
+    highlight_start = ann.start_index;
+    highlight_end = ann.end_index;
     prev_version_begining = text.slice(0,highlight_start);
     prev_version_end = text.slice(highlight_end);
     text_to_highlight = text.slice(highlight_start,highlight_end);
-    text = prev_version_begining +'<mark>'+text_to_highlight+'</mark>'+prev_version_end;
+
+    text = prev_version_begining 
+    +`<span class="highlight" onclick="set_cur_annotation(${ann.id})">`
+    +text_to_highlight+'</span>'
+    +prev_version_end;
   });
   book_display.innerHTML =text;
 }
@@ -232,8 +225,9 @@ function highlightSelectedText() {
       text_elm: highlight,
       start_index: book_contents.search(highlight.innerHTML), 
       end_index: book_contents.search(highlight.innerHTML)+highlight.innerHTML.length
-    };
-   
+    };//change .innerHTML to .textContents
+    //maybe instead of searhing remove highlights get index then refresh highlights
+  
   }
 }
 
