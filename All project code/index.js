@@ -537,6 +537,39 @@ app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
 });
 */
 
+
+// class notes below
+
+app.post('/notes', (req, res) => {
+  const { course_id, title, content } = req.body;
+  const query = 'INSERT INTO cnotes (course_id, title, content) VALUES ($1, $2, $3) RETURNING course_id, title, content';
+  const values = [course_id, title, content];
+  db.one(query, values)
+    .then(result => {
+      console.log('New note inserted into the database with course ID:', result.course_id);
+      res.status(201).json(result);
+    })
+    .catch(error => {
+      console.error('Error inserting new note into the database:', error);
+      res.status(500).send('Error inserting new note into the database');
+    });
+});
+
+app.get('/notes/:course_id', (req, res) => {
+  const course_id = req.params.course_id;
+  const query = 'SELECT * FROM cnotes WHERE course_id = $1';
+  const values = [course_id];
+
+  db.any(query, values)
+    .then(notes => {
+      res.status(200).json(notes);
+    })
+    .catch(error => {
+      console.error('Error fetching notes from the database:', error);
+      res.status(500).send('Error fetching notes from the database');
+    });
+});
+
 // *****************************************************
 // <!-- Section 5 : Start Server-->
 // *****************************************************
