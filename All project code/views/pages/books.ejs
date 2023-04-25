@@ -6,13 +6,12 @@
 <main>
   <div>
     <div class="filter">
-
-      <form action="/books" method="GET">
-        <input type="text" placeholder="Search" id="search" name="search"> </input>
-        <button type="submit" id="s-icon" class="bi bi-search"></button>
-      </form>
-        
-
+        <form action="/books" method="GET">
+            <div class="input-group">
+                <input type="text" placeholder="Search" id="search" name="search" class="form-control"> </input>
+                <button type="submit" id="s-icon" class="bi bi-search"></button>
+            </div>
+        </form>
     </div>
     <% try { %>
         <% var i = 0 %>
@@ -23,8 +22,7 @@
             <% i++ %>
             <div class="col-sm d-flex justify-content-center">
                 <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
-                    <button type="submit"id="b-icon"class="bi bi-bookmark-fill grey"style="font-size: 225%;"onclick="addFavorite('<%= book.title %>')"></button>
-                    <a class="card-block stretched-link" href="/singlebook/<%= book.id %>"></a>
+                    <button type="submit" id="b-icon" class="bi bi-bookmark-fill grey" style="font-size: 225%;" onclick="addFavorite('<%= book.title %>')"></button>
                     <div class="card-body" >
                         <img src="/book_img" class="card-img" height="55%"/>
                         <h5 class="card-title" style="padding-top: 5px;"><%= book.title %></h5>
@@ -34,7 +32,8 @@
                             <%} %>
                         </h6>
                         <h7 class="card-subtitle mb-2 text-muted"><b>Genre:</b> <%= book.subjects[0]%></h7><br>
-                        <h7 class="card-subtitle mb-2 text-muted"><b>Language:</b> <%= book.languages[0]%></h7>
+                        <h7 class="card-subtitle mb-2 text-muted"><b>Language:</b> <%= book.languages[0]%></h7><br>
+                        <a class="btn btn-primary" href="/singlebook/<%= book.id %>" style="margin-top: 1vh;">Read Now!</a>
                     </div>
                 </div>
             </div>
@@ -60,10 +59,6 @@
 </main>
 
 <script>
-    // var bookmark = document.querySelector(".card");
-    // bookmark.addEventListener('click',function(){
-    //     bookmark.classList.toggle('bi-bookmark black');   
-    // })
   function addFavorite(title) {
     fetch('/add_favorite', {
       method: 'POST',
@@ -75,13 +70,19 @@
       .then((res) => {
         if (res.status === 200) {
           // Update bookmark icon
-          message:"You have added this book"
           const icon = document.querySelector(`button[onclick="addFavorite('${title}')"`);
-          icon.classList.toggle('bi-bookmark');
-          icon.classList.toggle('black');
+          icon.classList.toggle('bi');
+          icon.classList.toggle('bookmark');
+          icon.classList.toggle('blue');
+          if(icon.classList.toggle === 'blue'){
+            message: "You removed the bookmark!"
+          }
+          else{
+            message: "You have bookmarked this book!";
+          }
         }
         if (res.status === 500) {
-          alert('You have added this book');
+          alert('You have already bookmarked this book!');
         }
       })
       .catch((err) => {
@@ -95,14 +96,6 @@
 <style>
     #blank{
         border: none;
-    }
-
-    #search {
-	    border-top: none;
-	    border-left: none;
-	    border-right: none;
-	    width: 200px;
-	    height: 30px;
     }
 
     #s-icon {
@@ -124,6 +117,21 @@
         scale: 1.1;
     }
 
+    .input-group {
+        max-width: 300px;
+        margin: 10px auto;
+        border-bottom: 1px solid #000000;
+    }
+
+    .form-control {
+        border: none;
+    }
+
+    .form-control:focus {
+        box-shadow: none;
+        border-color: transparent;
+    }
+
     .filter{
         padding-top: 1%;
         padding-bottom: 1%;
@@ -139,8 +147,8 @@
         color: #808080;
     }
 
-    .black{
-        color: black;
+    .blue{
+        color: #1DA1F2;
     }
 
 </style>
