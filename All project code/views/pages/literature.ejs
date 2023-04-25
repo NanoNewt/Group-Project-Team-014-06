@@ -46,9 +46,9 @@
         <div class="row">
             <!-- card 1 -->
             <div class="col-sm d-flex justify-content-center">
-                <div class="card bg-dark text-white" style="max-width: 22rem;">
+                <div class="card bg-dark text-white" style="max-width: 22rem; max-height: 22rem;">
                     <a class="card-block stretched-link" href="/books"></a>
-                    <img src="/book_img" class="card-img" alt="Stony Beach"/>
+                    <img src="/book_img" class="card-img" alt="Books"/>
                     <div class="card-img-overlay">
                       <h1 class="card-title" style="text-align: center;">Books</h1>
                     </div>
@@ -57,9 +57,9 @@
             </div>
             <!-- card 2 -->
             <div class="col-sm d-flex justify-content-center">
-                <div class="card bg-dark text-white" style="max-width: 22rem;">
+                <div class="card bg-dark text-white tilt-shake" style="max-width: 22rem; max-height: 22rem;">
                     <a class="card-block stretched-link" href="/class_notes"></a>
-                    <img src="/classnotes_img" class="card-img" alt="Stony Beach"/>
+                    <img src="/csnotespic" class="card-img" alt="Class Notes"/>
                     <div class="card-img-overlay">
                       <h1 class="card-title" style="text-align: center;">Class Notes</h1>
                     </div>
@@ -100,7 +100,7 @@
     }
 
     .card {
-        padding-bottom: 5vh;
+        margin-bottom: 10vh;
     }
 
     .card:hover {
@@ -109,6 +109,18 @@
         -webkit-filter: grayscale(85%);
         filter: grayscale(85%);
     }    
+
+    .tilt-shake {
+        animation: horizontal-shaking 0.35s infinite;
+    }
+
+    @keyframes tilt-shaking {
+        0% { transform: rotate(0deg); }
+        25% { transform: rotate(5deg); }
+        50% { transform: rotate(0deg); }
+        75% { transform: rotate(-5deg); }
+        100% { transform: rotate(0deg); }
+    }
 
 </style>
 

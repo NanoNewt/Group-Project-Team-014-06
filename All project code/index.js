@@ -354,6 +354,11 @@ app.get('/book_img', (req, res) => {
   res.sendFile(imagePath);
 });
 
+app.get('/csnotespic', (req, res) => {
+  const imagePath = path.join(__dirname, 'resources', 'img', 'test.jpg');
+  res.sendFile(imagePath);
+});
+
 app.get('/classnotes_img', (req, res) => {
   const imagePath = path.join(__dirname, 'resources', 'img', 'class_notes.jpg');
   res.sendFile(imagePath);
