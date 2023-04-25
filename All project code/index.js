@@ -111,6 +111,11 @@ app.get('/class_notes', (req, res) => {
 });
 
 app.post('/add_favorite', async (req, res) => {
+  // Check if user is logged in
+  if (!req.session.user) {
+    res.redirect("/login");
+    return;
+  }
   const { title, author, genre, description } = req.body;
    const username = req.session.user.username;
   try {
@@ -131,9 +136,14 @@ app.post('/add_favorite', async (req, res) => {
     res.sendStatus(200);
   } catch (err) {
     console.error(err);
-    res.sendStatus(500);
+    res.status(500).json({
+      status: 'error',
+    });
+ 
   }
 });
+
+
 
 
 
@@ -216,10 +226,6 @@ app.get("/profile", async (req, res) => {
     const booksValues = [username];
     const booksResult = await db.query(booksQuery, booksValues);
     const favoriteBooks = booksResult || [];
-    console.log('favoriteBooks query:', booksQuery);
-    console.log('favoriteBooks values:', booksValues);
-    console.log('favoriteBooks result:', booksResult);
-    console.log('favoriteBooks:', favoriteBooks);
 
 
 
@@ -251,7 +257,53 @@ app.get("/profile", async (req, res) => {
   }
 });
 
+// DELETE user data (books and annotations)
+// <!-- Endpoint 5 :  Delete User ("/delete_user") -->
+app.delete('/api/books/:bookID', function (req, res) {
+  const bookID = req.params.bookID;
+  const username = req.session.user.username;
+  const query = 'DELETE FROM user_to_books WHERE book_id = $1 AND username = $2; DELETE FROM user_to_books WHERE book_id = $1 AND username = $2;';
 
+  db.query(query, [bookID, username])
+    .then(function () {
+      res.status(200).json({
+        status: 'success',
+        message: `Book with ID ${bookID} and username ${username} deleted successfully.`,
+      });
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.status(500).json({
+        status: 'error',
+        message: 'Error occurred while deleting book.',
+      });
+    });
+});
+
+
+
+// Delete an annotation
+app.delete('/api/annotations/:annotationID', function (req, res) {
+  //Here we are using path parameter
+  const username = req.params.username;
+  const query = 'delete from user_to_annotations where username = $1 returning * ;';
+
+  db.any(query, [username])
+    // if query execution succeeds
+    // send success message
+    .then(function (data) {
+      res.status(200).json({
+        status: 'success',
+        data: data,
+        message: 'data deleted successfully',
+      });
+    })
+    // if query execution fails
+    // send error message
+    .catch(function (err) {
+      return console.log(err);
+    });
+});
 
 
 

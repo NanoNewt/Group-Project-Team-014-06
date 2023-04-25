@@ -1,5 +1,6 @@
 <%- include ('../partials/head') %>
 <%- include ('../partials/menu') %>
+<%- include ('../partials/message') %>
 
 
 <main>
@@ -74,15 +75,20 @@
       .then((res) => {
         if (res.status === 200) {
           // Update bookmark icon
+          message:"You have added this book"
           const icon = document.querySelector(`button[onclick="addFavorite('${title}')"`);
           icon.classList.toggle('bi-bookmark');
           icon.classList.toggle('black');
+        }
+        if (res.status === 500) {
+          alert('You have added this book');
         }
       })
       .catch((err) => {
         console.error(err);
       });
   }
+
 
 </script>
 
