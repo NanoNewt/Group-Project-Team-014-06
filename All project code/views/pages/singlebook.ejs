@@ -123,6 +123,27 @@ function initialize_page(){
         annotations.push(new_annotation);
       });
       highlight_annotations();
+      load_comments();
+    });
+  });
+}
+function load_comments(){
+  fetch('/get_comments_for_annotations', {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      annotations: annotations
+    })
+  })
+  .then(responce => {
+    responce.json().then( (result) =>{
+      result.forEach((ann) => {
+        annotation_to_load = annotations.find((a)=>{return a.id == ann.id});
+        annotation_to_load.comments = ann.comments;
+      });
     });
   });
 }
@@ -139,13 +160,29 @@ function removeAllChildren(node){
 }
 
 function add_comment(text){
-  // FIX ME: Push comment to database
-  //
-  //fetch('/add_comment', {
-
-  //})
-  cur_annotation.comments.push(text);
-  refresh_comments();
+  var new_comment;
+  fetch('/add_comment', {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      annotation_id: cur_annotation.id,
+      comment: text
+    })
+  })
+  .then(responce => {
+    responce.json().then( (result) =>{
+      new_comment = {
+        id:result.id,
+        comment: text
+      };
+      cur_annotation.comments.push(new_comment);
+      refresh_comments();
+    });
+  });
+  
 }
 
 function largest_id(array){
@@ -177,7 +214,7 @@ function refresh_comments(){
     new_comment = document.createElement('div');
     new_comment.classList.add('card');
     new_comment.classList.add('comment');
-    new_comment.innerHTML = comment;
+    new_comment.innerHTML = comment.comment;
 
     comments_section.appendChild(new_comment);
   });
