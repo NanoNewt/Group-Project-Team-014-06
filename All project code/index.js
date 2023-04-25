@@ -520,6 +520,23 @@ app.post('/add_comment', async (req,res) => {
   }
 });
 
+app.post('/annotations_for_page', async (req,res) => {
+  const book_id = req.body.book_id;
+  const page_number = req.body.page_number;
+
+  const condition = `(book_id = ${book_id}) AND (page_number = ${page_number})`
+  const query = `SELECT * FROM annotations WHERE ${condition};`;
+
+  try {
+    const responce = await db.any(query);
+    res.send(responce);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
 /*
 app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
   const book_id = req.body.book_id;

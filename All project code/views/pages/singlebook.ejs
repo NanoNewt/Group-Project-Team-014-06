@@ -88,16 +88,43 @@ let BOOK_ID;
 
 console.log(BOOK_ID);
 console.log(PAGE_NUMBER);
-document.querySelector("main").onload = onload_test();
+document.querySelector("main").onload = initialize_page();
 
-function onload_test(){
-  PAGE_NUMBER = Number(document.getElementById('current_page').innerHTML);
-  BOOK_ID = Number(document.getElementById('book_id').innerHTML);
-  book_contents = document.getElementById('book_display').innerHTML;
+function initialize_page(){
+  PAGE_NUMBER = Number(document.getElementById('current_page').textContent);
+  BOOK_ID = Number(document.getElementById('book_id').textContent);
+  book_contents = document.getElementById('book_display').textContent;
   page_length = book_contents.length;
   console.log(BOOK_ID);
   console.log(PAGE_NUMBER);
   console.log(page_length);
+
+  var new_annotation;
+  fetch('/annotations_for_page', {
+    method: "POST",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      book_id: BOOK_ID,
+      page_number: PAGE_NUMBER,
+    })
+  })
+  .then(responce => {
+    responce.json().then( (result) =>{
+      result.forEach((ann) => {
+        new_annotation = {
+        id:ann.id,
+        comments: [],
+        start_index: ann.start_index, 
+        end_index: ann.end_index 
+        };
+        annotations.push(new_annotation);
+      });
+      highlight_annotations();
+    });
+  });
 }
 
 function set_cur_annotation(id){
@@ -209,7 +236,7 @@ function highlight_annotations(ranges_to_highlight){
     +text_to_highlight+'</span>'
     +prev_version_end;
   });
-  book_display.innerHTML =text;
+  book_display.innerHTML = text;
 }
 
 function highlightSelectedText() {
@@ -223,9 +250,9 @@ function highlightSelectedText() {
     selection.addRange(range);
     return {
       text_elm: highlight,
-      start_index: book_contents.search(highlight.innerHTML), 
-      end_index: book_contents.search(highlight.innerHTML)+highlight.innerHTML.length
-    };//change .innerHTML to .textContents
+      start_index: book_contents.search(highlight.textContent), 
+      end_index: book_contents.search(highlight.textContent)+highlight.textContent.length
+    };
     //maybe instead of searhing remove highlights get index then refresh highlights
   
   }
