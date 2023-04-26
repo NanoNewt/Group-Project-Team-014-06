@@ -28,7 +28,7 @@
                         <h5 class="card-title" style="padding-top: 5px;"><%= book.title %></h5>
                         <h6 class="card-subtitle mb-2 text-muted"> <b>Author(s):</b>
                             <%for(var j = 0; j < book.authors.length; j++){ %>
-                                <%= book.authors[j]%>
+                                <%= book.authors[j].name%>
                             <%} %>
                         </h6>
                         <h7 class="card-subtitle mb-2 text-muted"><b>Genre:</b> <%= book.subjects[0]%></h7><br>
