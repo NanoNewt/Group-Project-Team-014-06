@@ -102,6 +102,17 @@
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 600px;
+  height: 70%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 70%;
+}
+
+.scrollable-cards {
+  overflow-y: auto;
+  flex-grow: 1;
+  margin-bottom: 20px;
 }
 
 .card {
@@ -163,8 +174,13 @@
     const modalTitle = document.createElement('h2');
     modalTitle.className = 'modal-title';
     modalTitle.textContent = rect.textContent;
-    modalContent.appendChild(modalTitle);
+    const headerWrapper = document.createElement('div');
+    headerWrapper.appendChild(modalTitle);
+    modalContent.appendChild(headerWrapper);
 
+    const scrollableCards = document.createElement('div');
+    scrollableCards.className = 'scrollable-cards';
+    modalContent.appendChild(scrollableCards);
 
     // const courseInfo = document.createElement('div');
     // courseInfo.className = 'card';
@@ -189,13 +205,12 @@
     addCardButton.style.borderRadius = '5px';
     addCardButton.style.cursor = 'pointer';
 
-  // ...
 addCardButton.addEventListener('click', () => {
   const newCardTitleText = prompt('Enter the title of the new class note:');
   const newCardContentText = prompt('Enter the content of the new class note:');
   
   const newCard = createCard(newCardTitleText, newCardContentText);
-  modalContent.insertBefore(newCard, addCardButton);
+  scrollableCards.appendChild(newCard);
 
   // Send a POST request to the server to store the new note in the database
   fetch('/notes', {
@@ -221,7 +236,9 @@ addCardButton.addEventListener('click', () => {
 
 
 
-  modalContent.appendChild(addCardButton);
+  const addButtonWrapper = document.createElement('div');
+  addButtonWrapper.appendChild(addCardButton);
+  modalContent.appendChild(addButtonWrapper);
 
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
@@ -254,6 +271,19 @@ function createCard(title, content) {
   
   card.appendChild(cardContent);
 
+  card.addEventListener('click', () => {
+    fullContentModalContent.innerHTML = ''; // Clear previous content
+
+    const fullCardTitle = document.createElement('h3');
+    fullCardTitle.textContent = title;
+    fullContentModalContent.appendChild(fullCardTitle);
+
+    const fullCardContent = document.createElement('p');
+    fullCardContent.textContent = content;
+    fullContentModalContent.appendChild(fullCardContent);
+
+    fullContentModal.style.display = 'block';
+  });
   return card;
 }
 
@@ -268,15 +298,39 @@ function fetchNotes(course_id, modalContent) {
     .then(notes => {
       notes.forEach(note => {
         const newCard = createCard(note.title, note.content);
-        modalContent.insertBefore(newCard, modalContent.querySelector('button'));
+        scrollableCards.appendChild(newCard);
+
       });
     })
     .catch(error => {
       console.error('There was a problem with the fetch operation:', error);
     });
+
 }
 });
 
+// MODAL INSIDE CREATED CARD 
+
+const { modal: fullContentModal, modalContent: fullContentModalContent } = createModal('fullContentModal');
+document.body.appendChild(fullContentModal);
+
+
+function createModal(id) {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = id;
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  modal.appendChild(modalContent);
+
+  return { modal, modalContent };
+}
+
+window.addEventListener('click', (event) => {
+  if (event.target === fullContentModal) {
+    fullContentModal.style.display = 'none';
+  }
+});
 </script>
 
 
