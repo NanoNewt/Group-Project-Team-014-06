@@ -384,6 +384,23 @@ app.get('/backsplash', (req, res) => {
   res.sendFile(imagePath);
 });
 
+
+
+
+
+
+
+// Authentication Middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    // Default to login page.
+    return res.redirect('/login');
+  }
+  next();
+};
+// Authentication Required
+app.use(auth);
+
 // Handle form submission
 app.get('/books', async (req, res) => { 
 
@@ -406,20 +423,33 @@ app.get('/books', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch books' });
 }});
 
+ // Puts books metadata in database is not all readly there.
+ // Then redirects to singlebook/:id
+app.get('/initial_singlebook/:id', async (req, res)=>{
+  const bookId = req.params.id;
+  const check_for_book_entry = `SELECT * FROM books WHERE id = ${bookId}`;
+
+  try {
+    const response = await db.oneOrNone(check_for_book_entry);
+    
+    if(response == null){// Put book metadata in database
+      const url = `https://gutendex.com/books/?ids=${bookId}`;
+      const gutenberg_response = await axios.get(url);
+      const book = gutenberg_response.data.results[0];
 
 
+      const cols = `id, title`;
+      const vals = `${bookId}, '${book.title}'`;
+      const INSERT = `INSERT INTO books (${cols}) VALUES (${vals});`;
 
-
-// Authentication Middleware.
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-    // Default to login page.
-    return res.redirect('/login');
+      await db.none(INSERT);
+    }
+    res.redirect(`/singlebook/${bookId}`)
   }
-  next();
-};
-// Authentication Required
-app.use(auth);
+  catch (error) {
+    console.log(error);
+  }
+});
 
 app.get('/singlebook/:id', async (req, res) => {
   try {
@@ -430,6 +460,8 @@ app.get('/singlebook/:id', async (req, res) => {
       contents: response.data,
       id: bookId
     };
+
+    
 
     if (req.query.currentPage) {
       currentPage = parseInt(req.query.currentPage);
