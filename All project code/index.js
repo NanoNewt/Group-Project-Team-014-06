@@ -440,7 +440,6 @@ app.use(auth);
 app.get('/books', async (req, res) => { 
 
   try {
-    //api does not require key
     var search = req.query.search;
 
     if(!search){
@@ -448,13 +447,30 @@ app.get('/books', async (req, res) => {
     }else{
       var response = await axios.get(`https://gutendex.com/books/?search=${search}`);
     }
-    
+    let currentPage = 1;
     var books = response.data.results;
-    res.render('pages/books', { books }); 
+
+    
+    //book cover stuff
+    
+    var bookCovers = {};
+
+    try {
+
+      for (let i = 0; i < books.length; i++) {
+        const response = await axios.get(`https://openlibrary.org/search.json?q=${books[i].title}`);
+        bookCovers[i] = response.data.docs[1]?.isbn?.[0] ?? null;
+      }
+    } catch {
+      //book covers were not retrievable
+    }
+    
+    res.render('pages/books', { books, bookCovers });
+    
 
   } catch (error) {
 
-    console.error(error);
+    console.log(error);
     res.status(500).json({ error: 'Failed to fetch books' });
 }});
 
@@ -685,6 +701,8 @@ app.post(`bookPage_from_bookID_and_pageNumber`, async (req,res) =>{
   }
 });
 */
+
+
 
 // *****************************************************
 // <!-- Section 5 : Start Server-->
