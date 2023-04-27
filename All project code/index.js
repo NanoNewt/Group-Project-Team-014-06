@@ -461,8 +461,10 @@ app.get('/books', async (req, res) => {
  // Puts books metadata in database is not all readly there.
  // Then redirects to singlebook/:id
 app.get('/initial_singlebook/:id', async (req, res)=>{
+  const LINES_PER_PAGE = 60;
   const bookId = req.params.id;
   const check_for_book_entry = `SELECT * FROM books WHERE id = ${bookId}`;
+  const check_for_book_pages = `SELECT * FROM book_pages WHERE book_id = ${bookId}`;
 
   try {
     const response = await db.oneOrNone(check_for_book_entry);
@@ -472,12 +474,29 @@ app.get('/initial_singlebook/:id', async (req, res)=>{
       const gutenberg_response = await axios.get(url);
       const book = gutenberg_response.data.results[0];
 
-
       const cols = `id, title`;
       const vals = `${bookId}, '${book.title}'`;
       const INSERT = `INSERT INTO books (${cols}) VALUES (${vals});`;
 
       await db.none(INSERT);
+    }
+
+    const book_pages_response = await db.manyOrNone(check_for_book_pages);
+    if(book_pages_response.length < 1){// Put empty book_pages in database
+      const url = `https://www.gutenberg.org/cache/epub/${bookId}/pg${bookId}.txt`;
+      const gutenberg_response = await axios.get(url);
+      const data = gutenberg_response.data;
+      const lines_in_book = data.split(/\r\n|\r|\n/).length;
+      const pages_in_book = Math.ceil(lines_in_book/LINES_PER_PAGE);
+      let insert_query = 'INSERT INTO book_pages (book_id, page_number, page_content) VALUES';
+      
+      for (let page_number = 0; page_number < pages_in_book; page_number++) {
+        let vals = `${bookId}, ${page_number}, 'empty'`;
+        insert_query += `(${vals}), `;
+      }
+      
+      insert_query = insert_query.slice(0,-2) + ';';
+      await db.none(insert_query);
     }
     res.redirect(`/singlebook/${bookId}`)
   }
@@ -574,12 +593,12 @@ app.get('/get_annotation_comments', async (req,res) => {
 });
 app.post('/add_comment', async (req,res) => {
   const annotation_id = req.body.annotation_id;
-  const comment_text = req.body.comment_text;
+  const comment = req.body.comment;
   const username = req.session.user.username;
 
   // Create query
   const cols = '(username,annotation_id,comment)';
-  const vals = `('${username}',${annotation_id},'${comment_text}')`;
+  const vals = `('${username}',${annotation_id},'${comment}')`;
   const query = `INSERT INTO comments ${cols} VALUES ${vals} RETURNING *;`;
 
   // Send query

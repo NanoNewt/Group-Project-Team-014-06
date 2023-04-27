@@ -3,11 +3,13 @@
 
 
       <% try {
-        const m = 30; //change this variable to alter # lines rendered per page
-        const startLine = (currentPage - 1) * m;
-        const endLine = startLine + m;
+        // IF HALF_NUM_LINES IS CHANGE NEED TO CHANGE LINES_PER_PAGE in index.js//initial_singlebook/:id to be 2xHALF_NUM_LINES
+        // ALSO IF HALF_NUM_LINES_CHANGED NEED TO RESET ALL DATA IN DATABASE
+        const HALF_NUM_LINES = 30; //change this variable to alter # lines rendered per page
+        const startLine = (currentPage - 1) * HALF_NUM_LINES;
+        const endLine = startLine + HALF_NUM_LINES;
         const page1 = book.contents.split('\n').slice(startLine, endLine).join('');
-        const page2 = book.contents.split('\n').slice(startLine+m, endLine+m).join('');
+        const page2 = book.contents.split('\n').slice(startLine+HALF_NUM_LINES, endLine+HALF_NUM_LINES).join('');
 
       %>
       
