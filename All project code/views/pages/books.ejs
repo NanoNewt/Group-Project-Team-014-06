@@ -15,7 +15,9 @@
     </div>
     <% try { %>
         <% var i = 0 %>
+        <% var c = -1; %>
         <% books.forEach(function(book) { %>
+            <% c++; %>
             <% if (i % 3 === 0){ %>
                 <div class="row">
             <%} %>
@@ -24,7 +26,7 @@
                 <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
                     <button type="submit" id="b-icon" class="bi bi-bookmark-fill grey" style="font-size: 225%;" onclick="addFavorite('<%= book.title %>')"></button>
                     <div class="card-body" >
-                        <img src="/book_img" class="card-img" height="55%"/>
+                      <img src="https://covers.openlibrary.org/b/isbn/<%= bookCovers[c] %>-L.jpg" class="card-img"/>
                         <h5 class="card-title" style="padding-top: 5px;"><%= book.title %></h5>
                         <h6 class="card-subtitle mb-2 text-muted"> <b>Author(s):</b>
                             <%for(var j = 0; j < book.authors.length; j++){ %>
