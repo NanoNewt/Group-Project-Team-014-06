@@ -46,10 +46,12 @@
             <button class="btn btn-primary" type="submit">Next Page</button>
           </form>
           <form method="GET" id="skipToForm">
-            <button class="btn btn-info" type="button" onclick="skipTo()">Skip to</button>
-            <input style="width: 40px"pattern="[0-9]+" type="text" id="skipToInput" name="skipToPage">
+            <button class="btn btn-info" type="button" onclick="skipTo()" id="skip">Skip to</button>
+            <input style="width: 40px" pattern="[0-9]+" type="text" id="skipToInput" name="skipToPage">
           </form>
+        
         </div>
+
       </div>
     </div>
 
@@ -76,9 +78,6 @@
       <% } %>
 </main>
 
-      
-
-  
 
 
 <%- include ('../partials/footer') %>
@@ -93,6 +92,17 @@ let PAGE_NUMBER;
 let BOOK_ID;
 
 document.querySelector("main").onload = initialize_page();
+var input = document.getElementById("skipToInput");
+
+input.addEventListener("keypress", function(event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("skip").click();
+  }
+});
 
 function initialize_page(){
   PAGE_NUMBER = Number(document.getElementById('current_page').textContent);
