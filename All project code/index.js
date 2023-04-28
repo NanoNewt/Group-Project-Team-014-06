@@ -533,8 +533,6 @@ app.get('/singlebook/:id', async (req, res) => {
       id: bookId
     };
 
-    
-
     if (req.query.currentPage) {
       currentPage = parseInt(req.query.currentPage);
     }
