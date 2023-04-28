@@ -79,13 +79,14 @@ CREATE TABLE books_to_annotation (
 );
 
 -- Create the cnotes table
-CREATE TABLE cnotes (
+CREATE TABLE IF NOT EXISTS cnotes (
     course_id SERIAL,
     title TEXT NOT NULL,
     content TEXT NOT NULL
 );
 
 
+INSERT INTO cnotes (course_id, title, content) VALUES ('1000','test','test');
 INSERT INTO users (username, password) VALUES ('test','test');
 INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6');
 INSERT INTO books (id, title, author, genre, description) VALUES (1513,'Romeo and Juliet','William Shakespeare','?','description');

@@ -65,7 +65,7 @@ app.use(
 // class notes below
 
 app.post('/notes', (req, res) => {
-  console.log('Request body:', req.body);
+  // console.log('Request body:', req.body);
   const { course_id, title, content } = req.body;
   const query = 'INSERT INTO cnotes (course_id, title, content) VALUES ($1, $2, $3) RETURNING course_id, title, content';
   const values = [course_id, title, content];
@@ -82,7 +82,7 @@ app.post('/notes', (req, res) => {
 
 app.get('/notes/:course_id', (req, res) => {
   const course_id = req.params.course_id;
-  const query = 'SELECT * FROM cnotes WHERE course_id = $1';
+  const query = 'SELECT * FROM "cnotes" WHERE course_id = $1';
   const values = [course_id];
 
   db.any(query, values)
@@ -143,6 +143,7 @@ app.get('/literature', (req, res) => {
 
 app.get('/class_notes', (req, res) => {
   res.render("pages/class_notes");
+  // console.log('Request body:', req.body);
 });
 
 app.post('/add_favorite', async (req, res) => {
@@ -453,19 +454,20 @@ app.get('/books', async (req, res) => {
     
     //book cover stuff
     
-    var bookCovers = {};
+    // var bookCovers = {};
 
-    try {
+    // try {
 
-      for (let i = 0; i < books.length; i++) {
-        const response = await axios.get(`https://openlibrary.org/search.json?q=${books[i].title}`);
-        bookCovers[i] = response.data.docs[1]?.isbn?.[0] ?? null;
-      }
-    } catch {
-      //book covers were not retrievable
-    }
+    //   // for (let i = 0; i < books.length; i++) {
+    //   //   const response = await axios.get(`https://openlibrary.org/search.json?q=${books[i].title}`);
+    //   //   bookCovers[i] = response.data.docs[1]?.isbn?.[0] ?? null;
+    //   // }
+    // } catch {
+    //   //book covers were not retrievable
+    // }
     
-    res.render('pages/books', { books, bookCovers });
+    // res.render('pages/books', { books, bookCovers});
+    res.render('pages/books', { books});
     
 
   } catch (error) {
