@@ -515,8 +515,9 @@ app.get('/singlebook/:id/:page_number', async (req, res) => {
     const get_pages_in_book = `SELECT * FROM books WHERE id = ${book_id};`;
     const pages_in_book_responce = await db.one(get_pages_in_book);
     const pages_in_book = pages_in_book_responce.pages_in_book;
+    const title = pages_in_book_responce.title;
 
-    res.render('pages/singlebook', {book_id, page_number, page_content, pages_in_book});
+    res.render('pages/singlebook', {book_id, page_number, page_content, pages_in_book, title});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch book contents' });
