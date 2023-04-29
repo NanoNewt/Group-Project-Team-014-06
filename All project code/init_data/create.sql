@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS cnotes;
 
 
+
 -- Create the users table
 CREATE TABLE users (
     username VARCHAR(50) PRIMARY KEY,

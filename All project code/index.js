@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcrypt'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part B.
+const { log } = require('console');
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -265,19 +266,23 @@ app.get("/profile", async (req, res) => {
 
 
     // Retrieve user's annotations and comments from database
+    // `SELECT * FROM comments WHERE annotation_id = ${annotation_id};`;
     const annotationsQuery = `
-      SELECT annotations.id, annotations.book_id, annotations.page_number, annotations.start_index, annotations.end_index, comments.comment
-      FROM annotations
-      LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
-      LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
-      LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
-      INNER JOIN users ON users.username = user_to_annotation.username
-      WHERE users.username = $1
-    `;
-    const annotationsValues = [username];
-    const annotationsResult = await db.query(annotationsQuery, annotationsValues);
-    const annotations = annotationsResult || [];
+    SELECT annotations.id, annotations.page_number, annotations.start_index, annotations.end_index, books.title, comments.comment
+    FROM annotations
+    INNER JOIN books_to_annotation ON books_to_annotation.annotation_id = annotations.id
+    INNER JOIN books ON books.id = books_to_annotation.book_id
+    LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
+    LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
+    LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+    LEFT JOIN users ON users.username = user_to_annotation.username
+    WHERE users.username = $1
+`;
 
+    const annotationsValues = [username];
+    const annotationResult = await db.query(annotationsQuery, annotationsValues);
+    const annotations = annotationResult || [];
+    console.log(':',annotations);
     // Render the profile page with user's data
     res.render("pages/profile", {
       username: username,
@@ -314,36 +319,6 @@ app.delete('/api/books/:bookID', function (req, res) {
       });
     });
 });
-
-
-
-// Delete an annotation
-app.delete('/api/annotations/:annotationID', function (req, res) {
-  //Here we are using path parameter
-  const username = req.params.username;
-  const query = 'delete from user_to_annotations where username = $1 returning * ;';
-
-  db.any(query, [username])
-    // if query execution succeeds
-    // send success message
-    .then(function (data) {
-      res.status(200).json({
-        status: 'success',
-        data: data,
-        message: 'data deleted successfully',
-      });
-    })
-    // if query execution fails
-    // send error message
-    .catch(function (err) {
-      return console.log(err);
-    });
-});
-
-
-
-
-
 
 
 app.get('/register', (req, res) => {
@@ -581,14 +556,26 @@ app.post('/create_annotation', async (req,res) => {
   const page_number = req.body.page_number;
   const start_index = req.body.start_index;
   const end_index = req.body.end_index;
+  const username = req.session.user.username;
 
   // Create insert sql
   const cols = '(book_id,page_number,start_index,end_index)';
   const vals = `(${book_id},${page_number},${start_index},${end_index})`;
+  console.log('inform:', vals);
   const insert_sql = `INSERT INTO annotations ${cols} VALUES ${vals} RETURNING *;`;
 
   try {
     const responce = await db.one(insert_sql);
+    const { id: annotation_id } = responce;
+    const user_to_annotation_cols = '(username, annotation_id)';
+    const user_to_annotation_vals = `('${username}',${annotation_id})`;
+    const books_to_annotation_cols = '(book_id, annotation_id)';
+    const books_to_annotation_vals = `('${book_id}',${annotation_id})`;
+    console.log('user_to_annotation:', user_to_annotation_vals);
+    const insert_user_to_annotation_sql = `INSERT INTO user_to_annotation ${user_to_annotation_cols} VALUES ${user_to_annotation_vals} RETURNING *;`;
+    const response1 = await db.one(insert_user_to_annotation_sql);
+    const insert_books_to_annotation_sql = `INSERT INTO books_to_annotation ${books_to_annotation_cols} VALUES ${books_to_annotation_vals } RETURNING *;`;
+    const response = await db.one(insert_books_to_annotation_sql);
     res.send(responce);
   } catch (error) {
     console.log(error);
@@ -617,9 +604,16 @@ app.post('/add_comment', async (req,res) => {
   const vals = `('${username}',${annotation_id},'${comment}')`;
   const query = `INSERT INTO comments ${cols} VALUES ${vals} RETURNING *;`;
 
+
   // Send query
   try {
     const responce = await db.one(query);
+    const { id: comment_id } = responce;
+    const colscom = '(annotation_id,comment_id)';
+    const valscom = `('${annotation_id}',${comment_id})`;
+    console.log('inform:', valscom);
+    const inserta_sql = `INSERT INTO annotation_to_comments ${colscom} VALUES ${valscom} RETURNING *;`;
+    const responce1 = await db.one(inserta_sql);
     console.log(responce);
     res.json(responce);
   } catch (error) {
