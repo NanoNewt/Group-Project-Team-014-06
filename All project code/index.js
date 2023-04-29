@@ -482,62 +482,66 @@ app.get('/initial_singlebook/:id', async (req, res)=>{
   const LINES_PER_PAGE = 60;
   const bookId = req.params.id;
   const check_for_book_entry = `SELECT * FROM books WHERE id = ${bookId}`;
-  const check_for_book_pages = `SELECT * FROM book_pages WHERE book_id = ${bookId}`;
 
   try {
     const response = await db.oneOrNone(check_for_book_entry);
-    
+    let pages_in_book;
     if(response == null){// Put book metadata in database
       const url = `https://gutendex.com/books/?ids=${bookId}`;
-      const gutenberg_response = await axios.get(url);
-      const book = gutenberg_response.data.results[0];
+      const gutenberg_response_metadata = await axios.get(url);
+      const book = gutenberg_response_metadata.data.results[0];
 
-      const cols = `id, title`;
-      const vals = `${bookId}, '${book.title}'`;
+      const book_text_url = `https://www.gutenberg.org/cache/epub/${bookId}/pg${bookId}.txt`;
+      const response_book_text = await axios.get(book_text_url);
+
+      const book_contents = response_book_text.data.replace(/'/g, "''");
+      const book_contents_line_array = book_contents.split('\n');
+      const lines_in_book = book_contents_line_array.length;
+      pages_in_book = Math.ceil(lines_in_book/LINES_PER_PAGE);
+
+      const cols = `id, title, pages_in_book`;
+      const vals = `${bookId}, '${book.title.replace(/'/g,"''")}', ${pages_in_book}`;
       const INSERT = `INSERT INTO books (${cols}) VALUES (${vals});`;
 
       await db.none(INSERT);
-    }
 
-    const book_pages_response = await db.manyOrNone(check_for_book_pages);
-    if(book_pages_response.length < 1){// Put empty book_pages in database
-      const url = `https://www.gutenberg.org/cache/epub/${bookId}/pg${bookId}.txt`;
-      const gutenberg_response = await axios.get(url);
-      const data = gutenberg_response.data;
-      const lines_in_book = data.split(/\r\n|\r|\n/).length;
-      const pages_in_book = Math.ceil(lines_in_book/LINES_PER_PAGE);
+      // Put empty book_pages in database
       let insert_query = 'INSERT INTO book_pages (book_id, page_number, page_content) VALUES';
       
-      for (let page_number = 0; page_number < pages_in_book; page_number++) {
-        let vals = `${bookId}, ${page_number}, 'empty'`;
+      for (let page_number = 1; page_number < (pages_in_book + 1); page_number++) {
+        const startLine = (page_number - 1) * LINES_PER_PAGE;
+        const endLine = startLine + LINES_PER_PAGE;
+        const page = book_contents_line_array.slice(startLine, endLine).join('');
+
+        const vals = `${bookId}, ${page_number}, '${page}'`;
         insert_query += `(${vals}), `;
       }
       
       insert_query = insert_query.slice(0,-2) + ';';
       await db.none(insert_query);
     }
-    res.redirect(`/singlebook/${bookId}`)
+    res.redirect(`/singlebook/${bookId}/1`)
   }
   catch (error) {
     console.log(error);
   }
 });
 
-app.get('/singlebook/:id', async (req, res) => {
+app.get('/singlebook/:id/:page_number', async (req, res) => {
   try {
-    const bookId = req.params.id;
-    const url = `http://www.gutenberg.org/files/${bookId}/${bookId}-0.txt`;
-    const response = await axios.get(url);
-    const book = {
-      contents: response.data,
-      id: bookId
-    };
+    const book_id = req.params.id;
+    let page_number = parseInt(req.params.page_number,10);
 
-    if (req.query.currentPage) {
-      currentPage = parseInt(req.query.currentPage);
-    }
+    const condition = `(book_id = ${book_id}) AND (page_number = ${page_number})`
+    const query = `SELECT * FROM book_pages WHERE ${condition};`;
+    const response = await db.one(query);
 
-    res.render('pages/singlebook', { book, currentPage });
+    const page_content = response.page_content;
+    const get_pages_in_book = `SELECT * FROM books WHERE id = ${book_id};`;
+    const pages_in_book_responce = await db.one(get_pages_in_book);
+    const pages_in_book = pages_in_book_responce.pages_in_book;
+
+    res.render('pages/singlebook', {book_id, page_number, page_content, pages_in_book});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch book contents' });
@@ -545,14 +549,9 @@ app.get('/singlebook/:id', async (req, res) => {
 });
 
 app.get('/changePage/:id/:pagenum', (req, res) => {
-  currentPage = parseInt(req.params.pagenum, 10);
-
-  if (currentPage < 1) {
-    currentPage = 1;
-  }
-  
+  const page_number = parseInt(req.params.pagenum,10); 
   const bookId = req.params.id;
-  res.redirect(`/singlebook/${bookId}`);
+  res.redirect(`/singlebook/${bookId}/${page_number}`);
 });
 
 app.get('/singlebook', (req, res) => {

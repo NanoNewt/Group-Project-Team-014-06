@@ -22,6 +22,7 @@ CREATE TABLE books (
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255),
     genre VARCHAR(255),
+    pages_in_book INT,
     description TEXT
 );
 

@@ -3,23 +3,18 @@
 
 
       <% try {
-        // IF HALF_NUM_LINES IS CHANGE NEED TO CHANGE LINES_PER_PAGE in index.js//initial_singlebook/:id to be 2xHALF_NUM_LINES
-        // ALSO IF HALF_NUM_LINES_CHANGED NEED TO RESET ALL DATA IN DATABASE
-        const HALF_NUM_LINES = 30; //change this variable to alter # lines rendered per page
-        const LINES_PER_PAGE = HALF_NUM_LINES *2
-        const startLine = (currentPage - 1) * HALF_NUM_LINES;
-        const endLine = startLine + HALF_NUM_LINES;
-        const page = book.contents.split('\n').slice(startLine, endLine+HALF_NUM_LINES).join('');
-
-        const lines_in_book = book.contents.split(/\r\n|\r|\n/).length;
-        const pages_in_book = Math.ceil(lines_in_book/LINES_PER_PAGE);
+        // IF LINES_PER_PAGE IS CHANGE NEED TO CHANGE LINES_PER_PAGE in index.js//initial_singlebook/:id
+        // ALSO IF LINES_PER_PAGE CHANGED NEED TO RESET ALL DATA IN DATABASE
+        const LINES_PER_PAGE = 60;
+        const page = page_content.split('\n').join('');
+        const lines_in_book = page_content.split('\n').length;
       %>
       
       <main>
         <!-- The following 2 divs are an attempt to pass ejs variables into 
           javascript without my syntax error detection getting a false positive -->
-        <div hidden id="current_page"><%=currentPage%></div>
-        <div hidden id="book_id"><%=book.id%></div>
+        <div hidden id="current_page"><%=page_number%></div>
+        <div hidden id="book_id"><%=book_id%></div>
 
   <div class="col-container">
     <div class="col-9">
@@ -32,17 +27,17 @@
 
         <!-- page number / buttons -->  
         <div style="display: flex; justify-content: center;">
-          <b>Page <%=currentPage%>/<%=pages_in_book%></b>
+          <b>Page <%=page_number%>/<%=pages_in_book%></b>
         </div>
         <div style="display: flex; justify-content: center;">
           <button class="btn btn-primary" onclick="create_annotation()">Annotate</button>
           <form method="GET" action="/books">
             <button class="btn btn-warning" type="submit">Back</button>
           </form>
-          <form method="GET" action="/changePage/<%=book.id%>/<%=currentPage-1%>">
+          <form method="GET" action="/changePage/<%=book_id%>/<%=page_number-1%>">
             <button class="btn btn-primary" type="submit">Prev Page</button>
           </form>
-          <form method="GET" action="/changePage/<%=book.id%>/<%=currentPage+1%>">
+          <form method="GET" action="/changePage/<%=book_id%>/<%=page_number+1%>">
             <button class="btn btn-primary" type="submit">Next Page</button>
           </form>
           <form method="GET" id="skipToForm">
@@ -303,7 +298,7 @@ function skipTo() {
     var form = document.getElementById('skipToForm');
     var input = document.getElementById('skipToInput');
     var value = input.value;
-    form.action = '/changePage/<%=book.id%>/' + value;
+    form.action = '/changePage/<%=book_id%>/' + value;
     form.submit();
   }
 
