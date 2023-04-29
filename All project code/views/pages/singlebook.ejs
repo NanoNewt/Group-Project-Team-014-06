@@ -104,9 +104,6 @@ function initialize_page(){
   BOOK_ID = Number(document.getElementById('book_id').textContent);
   book_contents = document.getElementById('book_display').textContent;
   page_length = book_contents.length;
-  console.log(BOOK_ID);
-  console.log(PAGE_NUMBER);
-  console.log(page_length);
 
   var new_annotation;
   fetch('/annotations_for_page', {
@@ -137,6 +134,10 @@ function initialize_page(){
   });
 }
 function load_comments(){
+  if(annotations.length < 1){
+    return;
+  }
+
   fetch('/get_comments_for_annotations', {
     method: "POST",
     headers: {
