@@ -86,3 +86,17 @@ describe('Home Page!', () => {
 //       });
 //   });
 // });
+
+describe('Literature Page!', () => {
+  // Sample test case given to test / endpoint.
+  it('Positive : /. Checking if it returns the API route for the Literature page', done => {
+    chai
+      .request(server)
+      .get('/literature')
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        expect(res).to.have.header('content-type','text/html; charset=utf-8');
+        done();
+      });
+  });
+});

@@ -132,7 +132,18 @@ app.get('/backsplash', (req, res) => {
 
 app.get('/literature', (req, res) => {
   
-  res.render("pages/literature");
+  res.render("pages/literature", {
+    status: 'success',
+    message: 'Home Page!'
+  });
+});
+
+app.get('/', (req, res) => {
+  res.render("pages/splash",
+  {
+    status: 'success',
+    message: 'Home Page!'
+  });
 });
 
 // app.get('/books', (req, res) => {
@@ -181,16 +192,6 @@ app.post('/add_favorite', async (req, res) => {
 });
 
 
-
-
-
-app.get('/', (req, res) => {
-  res.render("pages/splash",
-  {
-    status: 'success',
-    message: 'Home Page!'
-  });
-});
 
 //Lab 11 -- this is wrong to pass the negative case for lab 11.
 app.get('/bookmarks', (req, res) => {
