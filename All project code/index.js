@@ -151,7 +151,7 @@ app.get('/class_notes', (req, res) => {
     res.redirect("/login");
     return;
   }
-  
+
   res.render("pages/class_notes");
   // console.log('Request body:', req.body);
 });
@@ -510,7 +510,27 @@ app.get('/initial_singlebook/:id', async (req, res)=>{
 });
 
 app.get('/singlebook/:id/:page_number', async (req, res) => {
+  const bookId = req.params.id;
+
   try {
+
+    const annotationsQuery = `
+    SELECT annotations.id, annotations.page_number, annotations.start_index, annotations.end_index, books.title, comments.comment
+    FROM annotations
+    INNER JOIN books_to_annotation ON books_to_annotation.annotation_id = annotations.id
+    INNER JOIN books ON books.id = books_to_annotation.book_id
+    LEFT JOIN annotation_to_comments ON annotation_to_comments.annotation_id = annotations.id
+    LEFT JOIN comments ON comments.id = annotation_to_comments.comment_id
+    LEFT JOIN user_to_annotation ON user_to_annotation.annotation_id = annotations.id
+    LEFT JOIN users ON users.username = user_to_annotation.username
+    WHERE books.id = $1
+    `;
+
+    const annotationsValues = [bookId];
+    const annotationResult = await db.query(annotationsQuery, annotationsValues);
+    const annotations = annotationResult || [];
+    // console.log(':',annotations);
+
     const book_id = req.params.id;
     let page_number = parseInt(req.params.page_number,10);
 
@@ -524,7 +544,17 @@ app.get('/singlebook/:id/:page_number', async (req, res) => {
     const pages_in_book = pages_in_book_responce.pages_in_book;
     const title = pages_in_book_responce.title;
 
-    res.render('pages/singlebook', {book_id, page_number, page_content, pages_in_book, title});
+    // res.render('pages/singlebook', {book_id, page_number, page_content, pages_in_book, title});
+
+    res.render("pages/singlebook", {
+      book_id,
+      page_number,
+      page_content,
+      pages_in_book,
+      title,
+      annotations: annotations,
+      noAnnotations: annotations.length === 0,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch book contents' });

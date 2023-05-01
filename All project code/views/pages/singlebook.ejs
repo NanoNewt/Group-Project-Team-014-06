@@ -16,7 +16,7 @@
         <div hidden id="current_page"><%=page_number%></div>
         <div hidden id="book_id"><%=book_id%></div>
 
-  <div class="col-container">
+  <div class="col-container" style="height: 100%;">
     <div class="col-9">
       <div class="container" id="annotation_pages">
         <h1 style="max-height: 4.5rem; overflow: scroll;"><%= title %> </h1>
@@ -70,6 +70,49 @@
       <% } catch (error) { %>
         <p>Error: <%= error.message %></p>
       <% } %>
+
+  <!-- Display Annotations -->
+  <div>
+    <h1 style="text-align: center; padding-bottom: 1%;">Annotations: </h1>
+    <% if (annotations.length === 0) { %>
+      <div class="col-sm d-flex justify-content-center">
+        <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
+          <div class="card-body">
+            <p>No one has added annotations to this book yet!</p>
+          </div>
+        </div>
+      </div>
+    <% } else{%>
+        <% var i = 0; %>
+        <% annotations.forEach(annotation => { %>
+          <% if (i % 3 === 0){ %>
+              <div class="row">
+          <%} %>
+          <% i++ %>
+          <div class="col-sm d-flex justify-content-center">
+            <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
+              <div class="card-body">
+                <h5 class="card-title"><%= annotation.title %></h5>
+                <h7>Page <%= annotation.page_number %>, Characters <%= annotation.start_index %> to <%= annotation.end_index %></h6>
+                <h7>Comments:  <%= annotation.comment %></h6>
+              </div>
+            </div>
+          </div>
+          <!-- Blank card bc Bootstrap doesn't support creating static grids -->
+          <% if(i >= annotation.length && ((i % 3) != 0)){ %>
+            <div class="col-sm d-flex justify-content-center">
+                <div class="card" id="blank">
+                    <div class="card-body">
+                    </div>
+                </div>
+            </div>
+          <% } %>
+          <% if (i % 3 === 0) { %>
+            </div>
+          <% } %>
+        <% }); %>
+    <% }%>
+  </div>
 </main>
 
 
@@ -316,6 +359,10 @@ function skipTo() {
 
 <style>
 
+  .card{
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
 
 .form{
   padding: 2px;
