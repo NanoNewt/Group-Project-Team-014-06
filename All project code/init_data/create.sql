@@ -97,5 +97,8 @@ programs and to understand the nature of these security weaknesses so that you c
 write system code. We do not condone the use of any other form of attack to gain unauthorized access to
 any system resources.
 ');
-INSERT INTO users (username, password) VALUES ('test','test');
-INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6');
+INSERT INTO cnotes (course_id, title, content) VALUES ('2400','Data Lab','The purpose of this assignment is to become more familiar with bit-level representations of integers (and floating point) numbers. You will do this by solving a series of programming ``puzzles.'' Some of these puzzles are quite artificial, but you will find yourself thinking much more about bits in working your way through them.
+');
+
+INSERT INTO users (username, password) VALUES ('test','test'); --lab 11
+INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6'); --lab 11

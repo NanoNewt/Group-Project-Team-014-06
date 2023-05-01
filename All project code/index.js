@@ -147,6 +147,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/class_notes', (req, res) => {
+  if (!req.session.user) {
+    res.redirect("/login");
+    return;
+  }
+  
   res.render("pages/class_notes");
   // console.log('Request body:', req.body);
 });
