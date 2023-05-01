@@ -87,7 +87,15 @@ CREATE TABLE IF NOT EXISTS cnotes (
     content TEXT NOT NULL
 );
 
+INSERT INTO cnotes (course_id, title, content) VALUES ('2400','Bomb Lab','The nefarious Dr. Evil has planted a slew of “binary bombs” on our class machines. A binary bomb is a program that consists of a sequence of phases. Each phase expects you to type a particular string on stdin. If you type the correct string, then the phase is defused and the bomb proceeds to the next phase. Otherwise, the bomb explodes by printing "BOOM!!!" and then terminating. The bomb is defused when every phase has been defused.
 
-INSERT INTO cnotes (course_id, title, content) VALUES ('1000','test','test');
+There are too many bombs for us to deal with, so we are giving each student a bomb to defuse. Your mission, which you have no choice but to accept, is to defuse your bomb before the due date. Good luck, and welcome to the bomb squad!
+');
+INSERT INTO cnotes (course_id, title, content) VALUES ('2400','Attack Lab','In this lab, you will gain firsthand experience with methods used to exploit security weaknesses in
+operating systems and network servers. Our purpose is to help you learn about the runtime operation of
+programs and to understand the nature of these security weaknesses so that you can avoid them when you
+write system code. We do not condone the use of any other form of attack to gain unauthorized access to
+any system resources.
+');
 INSERT INTO users (username, password) VALUES ('test','test');
 INSERT INTO users (username, password) VALUES ('admin','$2b$10$OobnoGdMm7qtw4mq5Eqv/Oxbf1NJECNpfbTBxyrakBB2AtvqEDRK6');

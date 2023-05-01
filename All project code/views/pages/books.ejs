@@ -16,6 +16,7 @@
     <% try { %>
         <% var i = 0 %>
         <% var c = -1; %>
+
         <% books.forEach(function(book) { %>
             <% c++; %>
             <% if (i % 3 === 0){ %>
@@ -24,7 +25,16 @@
             <% i++ %>
             <div class="col-sm d-flex justify-content-center">
                 <div class="card" style="width: 20rem;" data-mdb-toggle="animation" data-mdb-animation="zoom-in" data-mdb-animation-start="onHover">
+                  <button type="submit" id="b-icon" class="bi bi-bookmark-fill grey" style="font-size: 225%;" onclick="addFavorite('<%= book.title %>')"></button>
+                  <% if(favoriteBooks.length === 0){%>
                     <button type="submit" id="b-icon" class="bi bi-bookmark-fill grey" style="font-size: 225%;" onclick="addFavorite('<%= book.title %>')"></button>
+                  <% }else {%>
+                    <% favoriteBooks.forEach(function(bookmark) {%>
+                      <% if (bookmark.title === book.title){%>
+                        <button type="submit" id="b-icon" class="bi bi-bookmark-fill blue" style="font-size: 225%;" onclick="addFavorite('<%= book.title %>')"></button>
+                      <%}%>
+                    <% })%>
+                  <% }%>
                     <div class="card-body" >
                         <!-- <img src="/book_img" class="card-img"> -->
                         <img src="https://www.gutenberg.org/files/<%= book.id%>/<%= book.id%>-h/images/cover.jpg" class="card-img">
@@ -78,12 +88,8 @@
           icon.classList.toggle('bi');
           icon.classList.toggle('bookmark');
           icon.classList.toggle('blue');
-          if(icon.classList.toggle === 'blue'){
-            message: "You removed the bookmark!"
-          }
-          else{
-            message: "You have bookmarked this book!";
-          }
+          alert('Added bookmark! Please go to profile page to remove!');
+          bookmarks.push(title);
         }
         if (res.status === 500) {
           alert('You have already bookmarked this book!');

@@ -146,13 +146,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// app.get('/books', (req, res) => {
-//   res.render("pages/books", {
-//     // books: ['b1', 'a1', 'g1'],
-//   });
-//   // console.log(books);
-// });
-
 app.get('/class_notes', (req, res) => {
   res.render("pages/class_notes");
   // console.log('Request body:', req.body);
@@ -414,9 +407,29 @@ const auth = (req, res, next) => {
 app.use(auth);
 
 // Handle form submission
+
 app.get('/books', async (req, res) => { 
 
   try {
+    if (!req.session.user) {
+      res.redirect("/login");
+      return;
+    }
+
+    const username = req.session.user.username;
+
+    // Retrieve user's favorite books from database
+    const booksQuery = `
+      SELECT books.id, books.title, books.author, books.genre, books.description
+      FROM books
+      INNER JOIN user_to_books ON user_to_books.book_id = books.id
+      INNER JOIN users ON users.username = user_to_books.username
+      WHERE users.username = $1
+    `;
+    const booksValues = [username];
+    const booksResult = await db.query(booksQuery, booksValues);
+    const favoriteBooks = booksResult || [];
+
     var search = req.query.search;
 
     if(!search){
@@ -427,29 +440,17 @@ app.get('/books', async (req, res) => {
     let currentPage = 1;
     var books = response.data.results;
 
-    
-    //book cover stuff
-    
-    // var bookCovers = {};
-
-    // try {
-
-    //   // for (let i = 0; i < books.length; i++) {
-    //   //   const response = await axios.get(`https://openlibrary.org/search.json?q=${books[i].title}`);
-    //   //   bookCovers[i] = response.data.docs[1]?.isbn?.[0] ?? null;
-    //   // }
-    // } catch {
-    //   //book covers were not retrievable
-    // }
-    
-    // res.render('pages/books', { books, bookCovers});
-    res.render('pages/books', { books});
-    
+    // Render the profile page with user's data
+    res.render("pages/books", {
+      username: username,
+      favoriteBooks: favoriteBooks,
+      noFavoriteBooks: favoriteBooks.length === 0,
+      books: books
+    }); 
 
   } catch (error) {
-
     console.log(error);
-    res.status(500).json({ error: 'Failed to fetch books' });
+    res.status(500).json({ error: 'Failed to fetch books and or user data' });
 }});
 
  // Puts books metadata in database is not all readly there.
