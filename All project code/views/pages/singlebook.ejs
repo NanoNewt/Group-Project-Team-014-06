@@ -19,7 +19,7 @@
   <div class="col-container">
     <div class="col-9">
       <div class="container" id="annotation_pages">
-        <h1><%= title %> </h1>
+        <h1 style="max-height: 4.5rem; overflow: scroll;"><%= title %> </h1>
         <pre id="book_display">
           <%= page %>
         </pre>
@@ -339,7 +339,7 @@ function skipTo() {
 
 #comment_section{
   border: 1px solid #000000;
-  height: 30vh;
+  height: 83%;
   overflow-y: scroll;
 }
 
@@ -351,7 +351,7 @@ function skipTo() {
 }
 
 #comment_section_row {
-  height: 45%;
+  height: 55%;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -390,7 +390,7 @@ function skipTo() {
 body{
   position: relative;
   min-height: 100vh; 
-  overflow: hidden;
+  
 }
 
 main{
