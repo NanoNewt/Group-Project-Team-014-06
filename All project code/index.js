@@ -320,6 +320,59 @@ app.delete('/api/books/:bookID', function (req, res) {
     });
 });
 
+app.delete('/api/annotations/:annotationID', function (req, res) {
+  const annotationID = req.params.annotationID;
+  const username = req.session.user.username;
+  const query2 = `
+    DELETE FROM annotation_to_comments
+    WHERE annotation_id = $1;
+  `;
+  const query = `
+    DELETE FROM comments
+    WHERE annotation_id = $1
+  `;
+  const query1 = `
+    DELETE FROM annotations
+    WHERE id = $1;
+  `;
+  const query3 = `
+  DELETE FROM user_to_annotation
+  WHERE annotation_id = $1 AND username = $2;
+`;
+  const query4 = `
+  DELETE FROM books_to_annotation
+  WHERE annotation_id = $1;
+`;
+  db.query(query2, [annotationID])
+    .then(function () {
+      return db.query(query, [annotationID]);
+    })
+    .then(function () {
+      return db.query(query3, [annotationID, username]);
+    })
+    .then(function () {
+      return db.query(query4, [annotationID]);
+    })
+    .then(function () {
+      return db.query(query1, [annotationID]);
+    })
+    .then(function () {
+      res.status(200).json({
+        status: 'success',
+        message: `Annotation with ID ${annotationID} and username ${username} deleted successfully.`,
+      });
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.status(500).json({
+        status: 'error',
+        message: 'Error occurred while deleting annotation.',
+      });
+    });
+});
+
+
+
 
 app.get('/register', (req, res) => {
   res.render("pages/register");
