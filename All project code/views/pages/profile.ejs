@@ -38,6 +38,7 @@
             <h6><%= annotation.title %></h6>
             <p>Page <%= annotation.page_number %>, Characters <%= annotation.start_index %> to <%= annotation.end_index %></p>
             <p>Comments:  <%= annotation.comment %></p>
+            <button class="btn btn-danger" onclick="deleteAnnotation(<%= annotation.id %>)">Delete</button>
           </li>
           <% }); %>
         </ul>
@@ -52,6 +53,22 @@
   if (confirm("Are you sure you want to delete this book?")) {
     $.ajax({
       url: "/api/books/" + bookId,
+      type: "DELETE",
+      success: function(result) {
+        // Reload the page to reflect the updated data
+        location.reload();
+      },
+      error: function(error) {
+        alert("Failed to delete book: " + error);
+      }
+    });
+  }
+}
+
+function deleteAnnotation(annotationId) {
+  if (confirm("Are you sure you want to delete this annotation?")) {
+    $.ajax({
+      url: "/api/annotations/" + annotationId,
       type: "DELETE",
       success: function(result) {
         // Reload the page to reflect the updated data
