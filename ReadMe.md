@@ -19,7 +19,7 @@ Node.js -- Runtime environment (backend). Here we made calls to the API and othe
 
 PostgreSQL -- Database (backend). Stored all of the data including user information, book information, class notes information, and annotation information. 
 
-## Prerequisites to Run Application
+## Prerequisites to Run Application:
 
 This app requires you to have docker installed (assumes you are using a Linux terminal): 
 
@@ -39,5 +39,31 @@ sudo docker-compose --version
 ```
 
 
-## How to Run Locally
+## How to Run Locally:
+
+Once docker is installed, clone the repository in any folder of your choice and run the following commands depending on your case:
+
+#### If this is your first time running the application: 
+
+```
+docker compose up -d
+docker compose down -v
+docker compose up
+```
+
+#### If you have ran the website locally before: 
+
+```
+docker compose up
+```
+
+Once you are ready to close the website:
+
+```
+docker compose down
+```
+
+## How to Run the Tests: 
+
+
 
