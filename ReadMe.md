@@ -51,6 +51,12 @@ docker compose down -v
 docker compose up
 ```
 
+Once you are ready to close the website:
+
+```
+docker compose down
+```
+
 #### If you have ran the website locally before: 
 
 ```
@@ -64,6 +70,16 @@ docker compose down
 ```
 
 ## How to Run the Tests: 
+There are a total of 6 tests, 5 of them are for lab 11, and the last one is to fulfill project requirements. 
 
+In order to run the tests navigate to the ```\All Project Code\test``` folder where you will see the file ```server.spec.js```. In order to run these tests make sure nothing is commented out and run the command: ```docker compose up```. If all the tests ran succuesfully you should see the message: ```6 passing```
+
+Since this is a fairly long process, if you don't want to run any of these tests and just want to run the application follow the steps above and comment out everything in the ```server.spec.js``` file. 
+
+## Link to Deployed Application: 
+
+http://recitation-14-team-06.eastus.cloudapp.azure.com:3000/
+
+#### Note, due to Microsoft Azure's free limit, this app may not be running. 
 
 
