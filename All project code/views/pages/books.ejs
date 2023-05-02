@@ -37,7 +37,7 @@
                   <% }%>
                     <div class="card-body" >
                         <!-- <img src="/book_img" class="card-img"> -->
-                        <img src="https://www.gutenberg.org/files/<%= book.id%>/<%= book.id%>-h/images/cover.jpg" class="card-img">
+                        <img src="https://www.gutenberg.org/files/<%= book.id%>/<%= book.id%>-h/images/cover.jpg" onerror="javascript:this.src='/book_img'" class="card-img">
                         
                         <h5 class="card-title" style="padding-top: 5px;"><%= book.title %></h5>
                         <h6 class="card-subtitle mb-2 text-muted"> <b>Author(s):</b>
