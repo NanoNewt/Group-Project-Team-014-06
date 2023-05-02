@@ -13,6 +13,30 @@
             </form>
         </div>
     </div>
+    <div class="modal" id="addNoteModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Class Note</h5>
+            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="noteTitle">Title</label>
+              <input type="text" class="form-control" id="noteTitle" placeholder="Enter the title">
+            </div>
+            <div class="form-group mt-2">
+              <label for="noteContent">Content</label>
+              <textarea class="form-control" id="noteContent" rows="5" placeholder="Enter the content"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="saveNote">Save Note</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="container">
       <div class="row justify-content-center">
         <div class="col">
@@ -256,6 +280,10 @@
 
 
 <style>
+#addNoteModal {
+  z-index: 2000;
+}
+
 #s-icon {
   background-color: transparent;
   border: none;
@@ -370,44 +398,133 @@
 
 
 <script>
-  const search = document.getElementById('search');
-  const clicktableRects = document.querySelectorAll('.clicktable-rect');
+  let saveNoteHandlerInitialized = false;
+  const addNoteModal = document.getElementById("addNoteModal");
+  const addNoteTitleInput = document.getElementById("noteTitle");
+  const addNoteContentInput = document.getElementById("noteContent");
 
-  search.addEventListener('input', () => {
+  const saveNoteButton = document.getElementById("saveNote");
+  saveNoteButton.addEventListener("click", saveNoteHandler);
+
+  const search = document.getElementById("search");
+  const clicktableRects = document.querySelectorAll(".clicktable-rect");
+  search.addEventListener("input", () => {
     const searchTerm = search.value.toLowerCase();
 
     clicktableRects.forEach((rect) => {
       const courseCode = rect.textContent.toLowerCase();
       if (courseCode.includes(searchTerm)) {
-        rect.style.display = 'block';
-        rect.classList.add('search-match');
+        rect.style.display = "block";
+        rect.classList.add("search-match");
       } else {
-        rect.style.display = 'none';
-        rect.classList.remove('search-match');
+        rect.style.display = "none";
+        rect.classList.remove("search-match");
       }
     });
   });
 
+  function addNoteToModal(title, content, scrollableCards, course_id) {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const cardTitle = document.createElement("div");
+    cardTitle.className = "card-title";
+    cardTitle.textContent = title;
+    card.appendChild(cardTitle);
+
+    const cardContent = document.createElement("div");
+    cardContent.className = "card-content";
+    const truncatedContent =
+      content.substring(0, 25) + (content.length > 25 ? "..." : "");
+    cardContent.textContent = truncatedContent;
+    card.appendChild(cardContent);
+
+    card.addEventListener("click", () => {
+      fullContentModalContent.innerHTML = ""; // Clear previous content
+
+      const fullCardTitle = document.createElement("h3");
+      fullCardTitle.textContent = title;
+      fullContentModalContent.appendChild(fullCardTitle);
+
+      const fullCardContent = document.createElement("p");
+      fullCardContent.textContent = content;
+      fullContentModalContent.appendChild(fullCardContent);
+
+      fullContentModal.style.display = "block";
+    });
+
+    scrollableCards.appendChild(card);
+
+    // Send a POST request to the server to store the new note in the database
+    fetch("/notes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        course_id: course_id,
+        title: title,
+        content: content,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+      });
+
+    // Close the Add New Note modal
+    document.getElementById("addNoteModal").style.display = "none";
+  }
+
+  function saveNoteHandler() {
+    const newCardTitleText = addNoteTitleInput.value;
+    const newCardContentText = addNoteContentInput.value;
+    const course_id = addNoteModal.getAttribute("data-course-id");
+    const scrollableCards = document.querySelector(
+      `#modal${course_id} .scrollable-cards`
+    );
+
+    addNoteToModal(
+      newCardTitleText,
+      newCardContentText,
+      scrollableCards,
+      course_id
+    );
+    addNoteModal.style.display = "none"; // Add this line to close the modal after saving
+  }
+
+  function initializeSaveNoteButton() {
+    const saveNoteButton = document.getElementById("saveNote");
+    saveNoteButton.removeEventListener("click", saveNoteHandler);
+    saveNoteButton.addEventListener("click", saveNoteHandler);
+  }
+
+  initializeSaveNoteButton(); // Call this function outside the loop
+
   // Create modals
   clicktableRects.forEach((rect) => {
-    const index = rect.getAttribute('data-index');
-    const modal = document.createElement('div');
-    modal.className = 'modal';
+    const index = rect.getAttribute("data-index");
+    const modal = document.createElement("div");
+    modal.className = "modal";
     modal.id = `modal${index}`;
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
+    const modalContent = document.createElement("div");
+    modalContent.className = "modal-content";
 
     fetchNotes(index, modalContent);
 
-    const modalTitle = document.createElement('h2');
-    modalTitle.className = 'modal-title';
+    const modalTitle = document.createElement("h2");
+    modalTitle.className = "modal-title";
     modalTitle.textContent = rect.textContent;
-    const headerWrapper = document.createElement('div');
+    const headerWrapper = document.createElement("div");
     headerWrapper.appendChild(modalTitle);
     modalContent.appendChild(headerWrapper);
 
-    const scrollableCards = document.createElement('div');
-    scrollableCards.className = 'scrollable-cards';
+    const scrollableCards = document.createElement("div");
+    scrollableCards.className = "scrollable-cards";
     modalContent.appendChild(scrollableCards);
 
     // const courseInfo = document.createElement('div');
@@ -422,143 +539,132 @@
     // courseInfo.appendChild(courseDescription);
     // modalContent.appendChild(courseInfo);
 
-    const addCardButton = document.createElement('button');
-    addCardButton.textContent = '+ Add New Class Note';
-    addCardButton.style.marginTop = '10px';
-    addCardButton.style.width = '100%';
-    addCardButton.style.padding = '10px';
-    addCardButton.style.backgroundColor = '#007bff';
-    addCardButton.style.color = '#ffffff';
-    addCardButton.style.border = 'none';
-    addCardButton.style.borderRadius = '5px';
-    addCardButton.style.cursor = 'pointer';
+    const addCardButton = document.createElement("button");
+    addCardButton.textContent = "+ Add New Class Note";
+    addCardButton.style.marginTop = "10px";
+    addCardButton.style.width = "100%";
+    addCardButton.style.padding = "10px";
+    addCardButton.style.backgroundColor = "#007bff";
+    addCardButton.style.color = "#ffffff";
+    addCardButton.style.border = "none";
+    addCardButton.style.borderRadius = "5px";
+    addCardButton.style.cursor = "pointer";
 
-addCardButton.addEventListener('click', () => {
-  const newCardTitleText = prompt('Enter the title of the new class note:');
-  const newCardContentText = prompt('Enter the content of the new class note:');
-  
-  const newCard = createCard(newCardTitleText, newCardContentText);
-  scrollableCards.appendChild(newCard);
+    addCardButton.addEventListener("click", () => {
+      addNoteModal.style.display = "block";
+      addNoteModal.setAttribute("data-course-id", index);
+      addNoteTitleInput.value = "";
+      addNoteContentInput.value = "";
 
-  // Send a POST request to the server to store the new note in the database
-  fetch('/notes', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      course_id: index,
-      title: newCardTitleText,
-      content: newCardContentText
-    })
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-  })
-  .catch(error => {
-    console.error('There was a problem with the fetch operation:', error);
-  });
-});
-
-
-
-  const addButtonWrapper = document.createElement('div');
-  addButtonWrapper.appendChild(addCardButton);
-  modalContent.appendChild(addButtonWrapper);
-
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-
-  rect.addEventListener('click', () => {
-    modal.style.display = 'block';
-  });
-
-  window.addEventListener('click', (event) => {
-    if (event.target === modal) {
-      modal.style.display = 'none';
-    }
-  });
-
-
-function createCard(title, content) {
-  const card = document.createElement('div');
-  card.className = 'card';
-
-  const cardTitle = document.createElement('div');
-  cardTitle.className = 'card-title';
-  cardTitle.textContent = title;
-  card.appendChild(cardTitle);
-
-  const cardContent = document.createElement('div');
-  cardContent.className = 'card-content';
-  
-  const truncatedContent = content.substring(0, 25) + (content.length > 25 ? '...' : '');
-  cardContent.textContent = truncatedContent;
-  
-  card.appendChild(cardContent);
-
-  card.addEventListener('click', () => {
-    fullContentModalContent.innerHTML = ''; // Clear previous content
-
-    const fullCardTitle = document.createElement('h3');
-    fullCardTitle.textContent = title;
-    fullContentModalContent.appendChild(fullCardTitle);
-
-    const fullCardContent = document.createElement('p');
-    fullCardContent.textContent = content;
-    fullContentModalContent.appendChild(fullCardContent);
-
-    fullContentModal.style.display = 'block';
-  });
-  return card;
-}
-
-function fetchNotes(course_id, modalContent) {
-  fetch(`/notes/${course_id}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      // Initialize the saveNoteHandler only if it has not been initialized before
+      if (!saveNoteHandlerInitialized) {
+        initializeSaveNoteButton();
+        saveNoteHandlerInitialized = true;
       }
-      return response.json();
-    })
-    .then(notes => {
-      notes.forEach(note => {
-        const newCard = createCard(note.title, note.content);
-        scrollableCards.appendChild(newCard);
-
-      });
-    })
-    .catch(error => {
-      console.error('There was a problem with the fetch operation:', error);
     });
 
-}
-});
+    // Close button click event
+    document
+      .querySelectorAll('[data-dismiss="modal"]')
+      .forEach((closeButton) => {
+        closeButton.addEventListener("click", () => {
+          document.getElementById("addNoteModal").style.display = "none";
+        });
+      });
 
-// MODAL INSIDE CREATED CARD 
+    const addButtonWrapper = document.createElement("div");
+    addButtonWrapper.appendChild(addCardButton);
+    modalContent.appendChild(addButtonWrapper);
 
-const { modal: fullContentModal, modalContent: fullContentModalContent } = createModal('fullContentModal');
-document.body.appendChild(fullContentModal);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
 
+    rect.addEventListener("click", () => {
+      modal.style.display = "block";
+    });
 
-function createModal(id) {
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.id = id;
-  const modalContent = document.createElement('div');
-  modalContent.className = 'modal-content';
-  modal.appendChild(modalContent);
+    window.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    });
 
-  return { modal, modalContent };
-}
+    function createCard(title, content) {
+      const card = document.createElement("div");
+      card.className = "card";
 
-window.addEventListener('click', (event) => {
-  if (event.target === fullContentModal) {
-    fullContentModal.style.display = 'none';
+      const cardTitle = document.createElement("div");
+      cardTitle.className = "card-title";
+      cardTitle.textContent = title;
+      card.appendChild(cardTitle);
+
+      const cardContent = document.createElement("div");
+      cardContent.className = "card-content";
+
+      const truncatedContent =
+        content.substring(0, 25) + (content.length > 25 ? "..." : "");
+      cardContent.textContent = truncatedContent;
+
+      card.appendChild(cardContent);
+
+      card.addEventListener("click", () => {
+        fullContentModalContent.innerHTML = ""; // Clear previous content
+
+        const fullCardTitle = document.createElement("h3");
+        fullCardTitle.textContent = title;
+        fullContentModalContent.appendChild(fullCardTitle);
+
+        const fullCardContent = document.createElement("p");
+        fullCardContent.textContent = content;
+        fullContentModalContent.appendChild(fullCardContent);
+
+        fullContentModal.style.display = "block";
+      });
+      return card;
+    }
+
+    function fetchNotes(course_id, modalContent) {
+      fetch(`/notes/${course_id}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((notes) => {
+          notes.forEach((note) => {
+            const newCard = createCard(note.title, note.content);
+            scrollableCards.appendChild(newCard);
+          });
+        })
+        .catch((error) => {
+          console.error("There was a problem with the fetch operation:", error);
+        });
+    }
+  });
+
+  // MODAL INSIDE CREATED CARD
+
+  const { modal: fullContentModal, modalContent: fullContentModalContent } =
+    createModal("fullContentModal");
+  document.body.appendChild(fullContentModal);
+
+  function createModal(id) {
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.id = id;
+    const modalContent = document.createElement("div");
+    modalContent.className = "modal-content";
+    modal.appendChild(modalContent);
+
+    return { modal, modalContent };
   }
-});
+
+  window.addEventListener("click", (event) => {
+    if (event.target === fullContentModal) {
+      fullContentModal.style.display = "none";
+    }
+  });
 </script>
 
 
